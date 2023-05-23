@@ -182,3 +182,52 @@ publishing{
 if(hasProperty('profile')){
     apply from:"${profile}-profile.gradle"
 }
+
+
+
+
+Build Path:
+
+Archive for required library: 'C:/Users/j245/.gradle/caches/modules-2/files-2.1/org.sonarqube/org.sonarqube.gradle.plugin/2.8/264d14d6939a5d679a31cac2db338bb624dbb776/org.sonarqube.gradle.plugin-2.8.jar' in project 'aep-template-creator' cannot be read or is not a valid ZIP file
+
+Web.xml
+
+Invalid element name:
+- display-name
+
+One of the following is expected:
+- distributable
+- context-param
+- filter
+- filter-mapping
+- listener
+- servlet
+- servlet-mapping
+- session-config
+- mime-mapping
+- welcome-file-list
+- error-page
+- jsp-config
+- security-constraint
+- login-config
+- security-role
+- message-destination
+- locale-encoding-mapping-list
+
+Error indicated by:
+{http://java.sun.com/xml/ns/
+ j2ee}
+with code:
+
+There are '39' errors in 'jsp_2_0.xsd'.
+
+checkstyle.xml
+
+Referenced file contains errors (http://www.puppycrawl.com/dtds/configuration_1_3.dtd).  For more information, right click on the message in the Problems View and select "Show Details..."
+
+checkstyle-suppressions.xml
+Referenced file contains errors (http://www.puppycrawl.com/dtds/suppressions_1_0.dtd).  For more information, right click on the message in the Problems View and select "Show Details..."
+
+
+The project cannot be built until build path errors are resolved
+
