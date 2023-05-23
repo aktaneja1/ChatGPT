@@ -1,4 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4" id="WebApp_ID">
+	<display-name>aep-template-creator</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
+
+Invalid element name:
+ - display-name
+
+One of the following is expected:
+ - distributable
+ - context-param
+ - filter
+ - filter-mapping
+ - listener
+ - servlet
+ - servlet-mapping
+ - session-config
+ - mime-mapping
+ - welcome-file-list
+ - error-page
+ - jsp-config
+ - security-constraint
+ - login-config
+ - security-role
+ - message-destination
+ - locale-encoding-mapping-list
+
+Error indicated by:
+ {http://java.sun.com/xml/ns/j2ee}
+with code:
+
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC
           "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
           "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
