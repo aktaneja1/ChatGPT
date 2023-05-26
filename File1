@@ -1,3 +1,66 @@
+<server>
+  <!-- Existing configuration -->
+  
+  <spring>
+    <profile>dev</profile>
+    <dataSource id="AEPTemplateServiceDB"
+                jndiName="AEPTemplateServiceDB"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+      <properties serverName="dev-db-host"
+                  portNumber="dev-db-port"
+                  databaseName="dev-db-name"
+                  user="dev-db-username"
+                  password="dev-db-password"/>
+    </dataSource>
+  </spring>
+
+  <spring>
+    <profile>stage</profile>
+    <dataSource id="AEPTemplateServiceDB"
+                jndiName="AEPTemplateServiceDB_Stage"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+      <properties serverName="stage-db-host"
+                  portNumber="stage-db-port"
+                  databaseName="stage-db-name"
+                  user="stage-db-username"
+                  password="stage-db-password"/>
+    </dataSource>
+  </spring>
+
+  <spring>
+    <profile>prod</profile>
+    <dataSource id="AEPTemplateServiceDB"
+                jndiName="AEPTemplateServiceDB"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+      <properties serverName="prod-db-host"
+                  portNumber="prod-db-port"
+                  databaseName="prod-db-name"
+                  user="prod-db-username"
+                  password="prod-db-password"/>
+    </dataSource>
+  </spring>
+
+  <!-- Remaining configuration -->
+
+</server>
+
+
+
+
+ENV SPRING_PROFILES_ACTIVE=dev
+
+docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev myapp-image
+
+
+
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <server>
     <featureManager>
