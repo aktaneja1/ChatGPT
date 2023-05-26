@@ -1,3 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+    <featureManager>
+        <feature>springBoot-2.0</feature>
+        <feature>servlet-4.0</feature>
+		<feature>appSecurity-3.0</feature>		
+		<feature>jdbc-4.2</feature>
+    </featureManager>
+	
+	<include location="/config/key.xml" />
+	
+	<keyStore id="BitBucketKeyStore"
+        location="/config/BitBucketKeyStore.jks"
+        type="JKS"
+        password="{aes}AC2GSHbtW7xNoiPVyAgjBAKu01U1gBc01PB91l8XhlQz"/>
+
+    
+    <spring>
+        <profile>dev<profile>  		
+	<dataSource id="AEPTemplateServiceDB"
+                jndiName="AEPTemplateServiceDB"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+  
+    <properties serverName="slf-ca-mo-dms-pd-aep.cowbsyd48lby.ca-central-1.rds.amazonaws.com"
+                    portNumber="8530"
+                    databaseName="aep"
+                    user="aep"
+                    password="{aes}AIQw6F/aoByJvrYaR5/kfVFGJHy38VZN2lNUbH8FRnuUQlkoLHT+LZoUauhV1YvTiw=="/>    
+
+    </dataSource>
+    </spring>
+
+    
+    <spring>
+        <profile>stage<profile>  		
+	<dataSource id="AEPTemplateServiceDB"
+                jndiName="AEPTemplateServiceDB_Stage"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+  
+    <properties serverName="slf-ca-mo-dms-stage-aep.cowbsyd48lby.ca-central-1.rds.amazonaws.com"
+                    portNumber="8530"
+                    databaseName="aep"
+                    user="aep"
+                    password="{aes}AIQw6F/aoByJvrYaR5/kfVFGJHy38VZN2lNUbH8FRnuUQlkoLHT+LZoUauhV1YvTiw=="/>    
+
+    </dataSource>
+    </spring>
+
+   
+    <spring>
+        <profile>prod<profile>  		
+	<dataSource id="AEPTemplateServiceDB"
+                jndiName="AEPTemplateServiceDB"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+  
+    <properties serverName="slf-ca-mo-dms-prod-aep.cowbsyd48lby.ca-central-1.rds.amazonaws.com"
+                    portNumber="8530"
+                    databaseName="aep"
+                    user="aep"
+                    password="{aes}AIQw6F/aoByJvrYaR5/kfVFGJHy38VZN2lNUbH8FRnuUQlkoLHT+LZoUauhV1YvTiw=="/>    
+
+    </dataSource>
+    </spring>    
+
+    <jdbcDriver id="postgresql-driver"
+                javax.sql.XADataSource="org.postgresql.xa.PGXADataSource"
+                javax.sql.ConnectionPoolDataSource="org.postgresql.ds.PGConnectionPoolDataSource"
+                libraryRef="postgresql-library"/>
+
+    <library id="postgresql-library">
+        <fileset id="PostgreSQLFileset" dir="/config"
+                includes="postgresql-42.2.11.jar"/>
+    </library>
+	
+	
+</server>
+
+
+
+
 FROM prod-dtr-ca.sunlifecorp.com/whs/websphere-openlb:latest_ibmjdk8
 
 LABEL com.sunlife.image.target=prod-dtr-ca.sunlifecorp.com/dsaep/template-creator-api
