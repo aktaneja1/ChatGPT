@@ -1,3 +1,44 @@
+FROM prod-dtr-ca.sunlifecorp.com/whs/websphere-openlb:latest_ibmjdk8
+
+LABEL com.sunlife.image.target=prod-dtr-ca.sunlifecorp.com/dsaep/template-creator-api
+LABEL com.sunlife.image.releasecandidate=TRUE
+
+ARG Artifactory_URL_BASE=https://artifactory.sunlifecorp.com/artifactory/libs-snapshot-local
+#ARG ARTIFACT_NAME=aep-template-creator-0.0.1-20210202.192614-13-dist.zip
+#ARG ARTIFACT_NAME=${ARTIFACT_NAME}
+#ARG Artifactory_URL_AEP_Template_Creator=${Artifactory_URL_AEP_Template_Creator}
+ARG Artifactory_URL_AEP_Template_Creator=https://artifactory.sunlifecorp.com/artifactory/libs-snapshot-local/ca/sunlife/aep/aep-template-creator/1.1.0-SNAPSHOT/aep-template-creator-1.1.0-20230508.144751-2-dist.zip
+#ARG Artifactory_URL_AEP_Sample=http://artifactory.sunlifecorp.com/artifactory/ei-web-hosting-services-local/applications/whs/sample/4/EnterpriseHelloWorld.ear
+ 
+#Copy configurations files specifc to application
+COPY --chown=default:root ./configurations /config
+
+# Download Artifacts and place it in dropings folder
+#RUN set -eux \
+#  && wget -q -U DS_AEP_Docker -O /config/dropins/EnterpriseHelloWorld.ear $Artifactory_URL_AEP_Sample
+
+# Download Artifacts and place it in dropings/spring folder ( For Springboot Apps)
+RUN set -eux \
+  && mkdir -p /config/dropins/spring \
+  && cd /tmp && wget -q -U DS_AEP_Docker $Artifactory_URL_AEP_Template_Creator \
+  && unzip aep-template-creator*.zip \
+  && mv /tmp/aep-template-creator/aep-template-creator.war /config/dropins/spring \
+  && cd /tmp && rm -rf aep*
+
+# Added for local testing, copy artifact locally (WAR/EAR)
+#COPY --chown=default:root ./localdir/localwar.war /config/dropins/
+
+# Added for local testing, copy artifact locally (Spring Boot application.)
+#COPY --chown=default:root ./localdir/localwar.jar /config/dropins/spring/filename-springboot.jar
+
+
+
+
+
+
+
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4" id="WebApp_ID">
 	<display-name>aep-template-creator</display-name>
