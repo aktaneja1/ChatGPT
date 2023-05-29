@@ -1,3 +1,12 @@
+spring:
+  profiles:
+    active: <your-spring-profile>
+  datasource:
+    url: jdbc:postgresql://slf-ca-mo-dms-pp-dbts-paeppd.chgjaq9poran.ca-central-1.rds.amazonaws.com:1480/aep
+    username: func_aepschem_rw
+    password: '{aes}AEuKN3G0PEfp60BxqkyPsKNZEdy05YEfBF6C/SPsFg4wTaL36fCiElGgDYMkgyt1sQ=='
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <server>
     <featureManager>
