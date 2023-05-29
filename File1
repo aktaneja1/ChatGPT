@@ -1,3 +1,25 @@
+server:
+  servlet:
+    context-path: '/TemplateCreator'
+spring: 
+  jpa: 
+    properties:
+      hibernate.temp.use_jdbc_metadata_defaults: false
+    hibernate:  
+      ddl-auto: validate  
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    jndi-name: AEPTemplateServiceDB*
+#    url: jdbc:postgresql://slf-ca-mo-dms-pd-aep.cowbsyd48lby.ca-central-1.rds.amazonaws.com:8530/aep
+#    username: aep
+#    password: 'CbH85kxfUF5qXZoqMgQ202TLhvfVty5KaZuW2ud2LLM='
+logging:
+    config: '/config/logback.xml'
+#    config: 'C:/eclipse/workspace/AEP-TemplateCreator/src/main/resources/logback.xml'
+
+
+
+
 <server>
   <!-- Existing configuration -->
   
