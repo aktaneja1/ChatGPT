@@ -1,3 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+    <featureManager>
+        <feature>springBoot-2.0</feature>
+        <feature>servlet-4.0</feature>
+		<feature>appSecurity-3.0</feature>		
+		<feature>jdbc-4.2</feature>
+    </featureManager>
+	
+	<include location="/config/key.xml" />
+	
+	<keyStore id="BitBucketKeyStore"
+        location="/config/BitBucketKeyStore.jks"
+        type="JKS"
+        password="{aes}AC2GSHbtW7xNoiPVyAgjBAKu01U1gBc01PB91l8XhlQz"/>
+
+    
+    <spring>
+        <profile>dev</profile>  		
+	<dataSource id="AEPTemplateServiceDB_dev"
+                jndiName="AEPTemplateServiceDB_dev"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+  
+    <properties serverName="slf-ca-mo-dms-pd-aep.cowbsyd48lby.ca-central-1.rds.amazonaws.com"
+                    portNumber="8530"
+                    databaseName="aep"
+                    user="aep"
+                    password="{aes}AIQw6F/aoByJvrYaR5/kfVFGJHy38VZN2lNUbH8FRnuUQlkoLHT+LZoUauhV1YvTiw=="/>    
+
+    </dataSource>
+    </spring>
+
+    
+    <spring>
+        <profile>stage</profile>  		
+	<dataSource id="AEPTemplateServiceDB_stage"
+                jndiName="AEPTemplateServiceDB_stage"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+  
+    <properties serverName="slf-ca-mo-dms-pp-dbts-paeppd.chgjaq9poran.ca-central-1.rds.amazonaws.com"
+                    portNumber="1480"
+                    databaseName="aep"
+                    user="func_aepschem_rw"
+                    password="{aes}AEuKN3G0PEfp60BxqkyPsKNZEdy05YEfBF6C/SPsFg4wTaL36fCiElGgDYMkgyt1sQ=="/>    
+
+    </dataSource>
+    </spring>
+
+   
+    <spring>
+        <profile>prod</profile>  		
+	<dataSource id="AEPTemplateServiceDB_prod"
+                jndiName="AEPTemplateServiceDB_prod"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true">
+  
+    <properties serverName="slf-ca-mo-dms-pp-dbts-paeppd.chgjaq9poran.ca-central-1.rds.amazonaws.com"
+                    portNumber="1480"
+                    databaseName="aep"
+                    user="func_aepschem_rw"
+                    password="{aes}AEuKN3G0PEfp60BxqkyPsKNZEdy05YEfBF6C/SPsFg4wTaL36fCiElGgDYMkgyt1sQ=="/>    
+
+    </dataSource>
+    </spring>    
+
+    <jdbcDriver id="postgresql-driver"
+                javax.sql.XADataSource="org.postgresql.xa.PGXADataSource"
+                javax.sql.ConnectionPoolDataSource="org.postgresql.ds.PGConnectionPoolDataSource"
+                libraryRef="postgresql-library"/>
+
+    <library id="postgresql-library">
+        <fileset id="PostgreSQLFileset" dir="/config"
+                includes="postgresql-42.2.11.jar"/>
+    </library>
+	
+	
+</server>
+
+
+
+
+
+server:
+  servlet:
+    context-path: '/TemplateCreator'
+spring: 
+  jpa: 
+    properties:
+      hibernate.temp.use_jdbc_metadata_defaults: false
+    hibernate:  
+      ddl-auto: validate  
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    jndi-name: AEPTemplateServiceDB_stage
+#    url: jdbc:postgresql://slf-ca-mo-dms-pd-aep.cowbsyd48lby.ca-central-1.rds.amazonaws.com:8530/aep
+#    username: aep
+#    password: 'CbH85kxfUF5qXZoqMgQ202TLhvfVty5KaZuW2ud2LLM='
+logging:
+    config: '/config/logback.xml'
+#    config: 'C:/eclipse/workspace/AEP-TemplateCreator/src/main/resources/logback.xml'
+
+
+config/dropins/spring
+
+
+
+
+
+
+
+
+
+
 [5/29/23 2:14:36:998 EDT] 00000052 com.ibm.ws.app.manager.AppMessageHelper                      E CWWKZ0002E: An exception occurred while starting the application aep-template-creator. The exception message was: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Unsatisfied dependency expressed through method 'dataSourceScriptDatabaseInitializer' parameter 0; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/JndiDataSourceAutoConfiguration.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is org.springframework.jdbc.datasource.lookup.DataSourceLookupFailureException: Failed to look up JNDI DataSource with name 'AEPTemplateServiceDB_stage*'; nested exception is javax.naming.NameNotFoundException: AEPTemplateServiceDB_stage*
 
 
