@@ -1,3 +1,6 @@
+E CWWKZ0002E: An exception occurred while starting the application aep-template-creator. The exception message was: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Invocation of init method failed; nested exception is javax.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution
+
+
 <library id="postgresql-library">
   <fileset dir="path/to/driver/files" includes="postgresql-*.jar" />
 </library>
