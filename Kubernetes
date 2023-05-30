@@ -1,0 +1,295 @@
+
+k8s/base/_liberty-ingress.yaml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: aep-templatecreator-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.class: "nginx-ingress1-dev-corp-wk"
+    nginx.ingress.kubernetes.io/proxy-redirect-from: http://$http_host/
+    nginx.ingress.kubernetes.io/proxy-redirect-to: https://$http_host//$namespace//aep-templatecreator-service/
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /my-namespace/(.*)
+        backend:
+          serviceName: aep-templatecreator-service
+          servicePort: 9080
+          
+          
+   _persistentvolumeclaim.yaml
+   
+   kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: liberty-logvolume-pvc
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100M 
+      
+      
+    kustomization.yaml
+    
+    
+    ---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Adds namespace to all resources.
+#namespace: my-namespace                        # must be in an overlay
+
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/name: templatecreator
+
+resources:
+- liberty-service.yaml
+- liberty-deployment.yaml
+#- liberty-ingress.yaml
+
+
+
+liberty-deployment.yaml
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: aep-templatecreator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        sunlife.com/app: aep-templatecreator-pod
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    sunlife.com/app: aep-templatecreator-pod
+                topologyKey: kubernetes.io/hostname
+      containers:
+      - name: aep-templatecreator-container
+        image: prod-dtr-ca.sunlifecorp.com/dsaep/template-creator-api:19
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "25m"
+            memory: 256Mi
+          limits:
+            cpu: "500m"
+            memory: 2048Mi
+        ports:
+         - name: pod-http-port
+           containerPort: 9080
+           protocol: TCP
+         - name: pod-https-port
+           containerPort: 9443
+           protocol: TCP
+        readinessProbe:
+          httpGet:
+            port: pod-http-port
+            path: /LBHealthCheck/HealthCheck
+          initialDelaySeconds: 5
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            port: pod-http-port
+            path: /LBHealthCheck/HealthCheck
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        volumeMounts:
+          - name: logs-volume
+            mountPath: /output/logs
+            subPath: env/WHS-01/openlb
+      initContainers:
+      - name: whs-liberty-permission-fix-container
+        image: prod-dtr-ca.sunlifecorp.com/whs/toolbox:1.0.0
+        command: ["/bin/chown","-R","1001:0", "/output/logs"]
+        volumeMounts:
+          - name: logs-volume
+            mountPath: /output/logs
+            subPath: env/WHS-01/openlb
+      volumes:
+      - name: logs-volume
+        emptyDir: {}
+        
+        
+        liberty-service.yaml
+        
+        
+        ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aep-templatecreator-service
+spec:
+  ports:
+  - name: http-port
+    port: 9080
+    targetPort: 9080
+  selector:
+    sunlife.com/app: aep-templatecreator-pod
+    
+    
+    
+    
+    k8s/overlays/dev/ingress
+    
+    ingress-wk.yaml
+    
+    apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: aep-templatecreator-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.class: "nginx-ingress1-dev-corp-wk"
+    nginx.ingress.kubernetes.io/proxy-redirect-from: http://$http_host/
+    nginx.ingress.kubernetes.io/proxy-redirect-to: https://$http_host//$namespace//aep-templatecreator-service/
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /dev-dsaep-templatecreator-ns/aep-templatecreator-service/(.*)
+        backend:
+          serviceName: aep-templatecreator-service
+          servicePort: 9080
+          
+          
+          kustomization.yaml
+          
+          ---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ingress-wk.yaml
+
+
+
+
+ingress-class-patch.yaml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: aep-templatecreator-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx-ingress1-dev-corp-wk"
+    #kubernetes.io/ingress.class: "nginx-ingress1-dev-corp-ca-central"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /dev-dsaep-templatecreator-ns/aep-templatecreator-service/(.*)
+        backend:
+          serviceName: aep-templatecreator-service
+          servicePort: 9080
+          
+          
+     
+     kustomization.yaml
+     
+     ---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dev-dsaep-templatecreator-ns
+
+commonLabels:
+  kubernetes.sunlife.com/sdlcenv.dev: "true"
+  sunlife.com/node.licensing.none: "true"
+#  topology.kubernetes.io/region: "slf-canada"
+#  topology.kubernetes.io/zone: "slf-canada-wk"
+#  topology.kubernetes.io/region: "ca-central-1"
+#  topology.kubernetes.io/zone: "ca-central-1a"
+  sunlife.com/node.network: "corp"
+
+bases:
+- ../../base
+- ingress
+
+patchesStrategicMerge:
+#- ingress-class-patch.yaml
+- liberty-deployment-patch.yaml
+- node-affinity-patch.yaml
+
+
+
+liberty-deployment-patch.yaml
+
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: aep-templatecreator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 5
+  template:
+    metadata:
+      labels:
+        sunlife.com/app: aep-templatecreator-pod
+    spec:
+      containers:
+      - name: aep-templatecreator-container
+        image: prod-dtr-ca.sunlifecorp.com/dsaep/template-creator-api:17
+        resources:
+          requests:
+            cpu: "25m"
+            memory: 512Mi
+          limits:
+            cpu: "500m"
+            memory: 1024Mi
+        env:
+          - name: MYENV
+            value: dev
+        volumeMounts:
+          - name: logs-volume
+            mountPath: /output/logs
+            subPath: dev/WHS-01/openlb
+      initContainers:
+      - name: whs-liberty-permission-fix-container
+        image: prod-dtr-ca.sunlifecorp.com/whs/toolbox:latest
+        volumeMounts:
+          - name: logs-volume
+            mountPath: /output/logs
+            subPath: dev/WHS-01/openlb
+            
+            
+            
+            
+        node-affinity-patch.yaml
+        
+        
+        apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aep-templatecreator
+spec:
+  template:
+    spec:
+      nodeSelector:
+        sunlife.com/node.sdlc.dev: "true"
+        sunlife.com/node.licensing.none: "true"
+        #topology.kubernetes.io/region: "ca-central-1"
+        #topology.kubernetes.io/zone: "ca-central-1a"
+        topology.kubernetes.io/region: "slf-canada"
+        topology.kubernetes.io/zone: "slf-canada-wk"
+        sunlife.com/node.network: "corp"
+        sunlife.com/app.nonercrestricted: "true"
