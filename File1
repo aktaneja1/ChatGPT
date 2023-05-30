@@ -1,3 +1,66 @@
+# DS AEP Container Image Repository
+
+## Introduction
+
+This repo. contains docker files and configurations required for AEP related docker container images.
+
+## How it Works
+
+### Explaining the project structure:
+1. Configuration Folder:
+    i. application.xml : It is liberty specific config file which stores DB confiuration and its drivers and bitbucket keystore
+    ii. BitBucketKeyStore.jks: Its java key store having keys and values
+    iii. jvm.options : It stores java options and paths of different properties, log files and other configs
+    iv.  key.xml : It holds the key that is used to decrypt keys encrypted in liberty
+    v. logback.xml : This is the logback file that defines loggers and appender for the application
+
+Note: All above files are copied to /config folder in container
+
+2. K8s Folder: It contains the base and overlays directory where base directory contains the base kubernetes resources configuration and overlays contains the environment specific 
+kubernetes configuration. mainly from the overlays folder we are trying to overwrite liberty-deployment file (which has all POD related info and labels) and liberty-service file whicj
+has port configurations like which ports of POD points to which port of Service
+
+### How does it works locally:
+- For testing it locally, you need to edit the docker file:
+    > In case, you want to refer the locol WAR file generated from template-creator project:
+        i. Comment the following lines:
+             ARG Artifactory_URL_AEP_Template_Creator=${Artifactory_URL_AEP_Template_Creator}
+             && cd /tmp && wget -q -U DS_AEP_Docker $Artifactory_URL_AEP_Template_Creator \
+             && unzip aep-template-creator*.zip \
+             && mv /tmp/aep-template-creator/aep-template-creator.war /config/dropins/spring \
+             && cd /tmp && rm -rf aep*
+        ii. Uncomment the line and add your local directory path of WAR file:
+             COPY --chown=default:root ./localdir/localwar.war /config/dropins/
+        
+        So your docker file will look like:
+        ./images/image1
+    
+    > In case, you want to refer dist.jar in artifactory:
+        i. Comment the below line:
+            ARG Artifactory_URL_AEP_Template_Creator=${Artifactory_URL_AEP_Template_Creator}
+        ii. Add the below line:
+             ARG Artifactory_URL_AEP_Template_Creator=https://artifactory.sunlifecorp.com/artifactory/libs-snapshot-local/ca/sunlife/aep/aep-template-creator/1.1.0-SNAPSHOT/aep-template-creator-1.1.0-20230508.144751-2-dist.zip
+
+        So your docker file will look like:
+        ./images/image1
+
+- After docker file is edited, build the docker image using command:
+    docker build .
+
+- Then Run the docker image to create a container and map port to 9080:
+    docker run -p 9080:9080 <name of your image>
+
+- To see the logs, do:
+    docker exec -it <container name> bash
+    cd /output/logs/message.log
+
+- To test the application use     http://localhost:9080/TemplateCreator
+
+## Maintained By
+
+DS MDPowers Team
+
+
 E CWWKZ0002E: An exception occurred while starting the application aep-template-creator. The exception message was: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Invocation of init method failed; nested exception is javax.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution
 
 
