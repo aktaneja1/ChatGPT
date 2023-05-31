@@ -2,6 +2,76 @@
 
 ## Introduction
 
+This repository contains Docker files and configurations required for AEP-related Docker container images.
+
+## How it Works
+
+### Explaining the Project Structure:
+1. Configuration Folder:
+    - `application.xml`: It is a Liberty-specific config file that stores DB configuration, drivers, and Bitbucket keystore.
+    - `BitBucketKeyStore.jks`: It is a Java keystore that contains keys and values.
+    - `jvm.options`: It stores Java options and paths of different properties, log files, and other configurations.
+    - `key.xml`: It holds the key used to decrypt keys encrypted in Liberty.
+    - `logback.xml`: This is the logback file that defines loggers and appenders for the application.
+
+   **Note:** All the above files are copied to the `/config` folder in the container.
+
+2. K8s Folder: It contains the `base` and `overlays` directories. The `base` directory contains the base Kubernetes resource configuration, and `overlays` contains the environment-specific Kubernetes configuration. Mainly from the `overlays` folder, we are trying to overwrite the `liberty-deployment` file (which has all POD-related info and labels) and `liberty-service` file, which has port configurations for mapping the POD ports to Service ports.
+
+### How it Works Locally:
+- To test it locally, you need to edit the Dockerfile:
+  - In case you want to refer to the local WAR file generated from the `template-creator` project:
+    1. Comment the following lines:
+        ```Dockerfile
+        # ARG Artifactory_URL_AEP_Template_Creator=${Artifactory_URL_AEP_Template_Creator} && \
+        #     cd /tmp && wget -q -U DS_AEP_Docker $Artifactory_URL_AEP_Template_Creator && \
+        #     unzip aep-template-creator*.zip && \
+        #     mv /tmp/aep-template-creator/aep-template-creator.war /config/dropins/spring && \
+        #     cd /tmp && rm -rf aep*
+        ```
+    2. Uncomment the line and add the local directory path of the WAR file:
+        ```Dockerfile
+        # COPY --chown=default:root ./localdir/localwar.war /config/dropins/
+        ```
+    
+    Your Dockerfile will look like:
+    ```Dockerfile
+    ./images/image1
+    ```
+
+  - In case you want to refer to `dist.jar` in Artifactory:
+    1. Comment the following line:
+        ```Dockerfile
+        # ARG Artifactory_URL_AEP_Template_Creator=${Artifactory_URL_AEP_Template_Creator}
+        ```
+    2. Add the following line:
+        ```Dockerfile
+        # ARG Artifactory_URL_AEP_Template_Creator=https://artifactory.sunlifecorp.com/artifactory/libs-snapshot-local/ca/sunlife/aep/aep-template-creator/1.1.0-SNAPSHOT/aep-template-creator-1.1.0-20230508.144751-2-dist.zip
+        ```
+    
+    Your Dockerfile will look like:
+    ```Dockerfile
+    ./images/image1
+    ```
+
+- After editing the Dockerfile, build the Docker image using the command:
+docker build .
+
+
+- Then run the Docker image to create a container and map the port to `9080`:
+
+docker run -p 9080:9080 <name of your image>
+
+
+- To see the logs, execute:
+
+
+
+
+# DS AEP Container Image Repository
+
+## Introduction
+
 This repo. contains docker files and configurations required for AEP related docker container images.
 
 ## How it Works
