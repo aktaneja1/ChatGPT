@@ -1,3 +1,18 @@
+WLP_SKIP_MAXPERMSIZE=true
+WLP_SKIP_UMASK=true
+IBM_HEAPDUMPDIR=logs
+IBM_COREDIR=logs
+IBM_JAVACOREDIR=logs
+JAVA_HOME=/opt/ibm/java/jre
+DB_URL=<DB_URL>
+DB_portNumber=<DB_portNumber>
+DB_databaseName=<DB_databaseName>
+DB_user=<DB_user>
+DB_password=<AES Encrypted DB_password> 
+# Please note that DB Password must be Encrypted because
+# server.env file would be just encoded and saved as a secret configuration in K8 overlays.
+
+
 ---
 kind: Deployment
 apiVersion: apps/v1
