@@ -1,3 +1,15 @@
+apiVersion: v1
+data:
+  server.env: V0xQX1NLSVBfTUFYUEVSTVNJWkU9dHJ1ZQ0KV0xQX1NLSVBfVU1BU0s9dHJ1ZQ0KSUJNX0hFQVBEVU1QRElSPWxvZ3MNCklCTV9DT1JFRElSPWxvZ3MNCklCTV9KQVZBQ09SRURJUj1sb2dzDQpKQVZBX0hPTUU9L29wdC9pYm0vamF2YS9qcmUNCkRCX1VSTD1zbGYtY2EtbW8tZG1zLXBkLWFlcC5jb3dic3lkNDhsYnkuY2EtY2VudHJhbC0xLnJkcy5hbWF6b25hd3MuY29tDQpEQl9wb3J0TnVtYmVyPTg1MzANCkRCX2RhdGFiYXNlTmFtZT1hZXANCkRCX3VzZXI9ZnVuY19hZXANCkRCX3Bhc3N3b3JkPXthZXN9QUlRdzZGL2FvQnlKdnJZYVI1L2tmVkZHSkh5MzhWWk4ybE5VYkg4RlJudVVRbGtvTEhUK0xab1VhdWhWMVl2VGl3PT0=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: liberty-serverenv-secret
+  namespace: dev-dsaep-templatecreator-ns
+
+
+
+
 # DS AEP Container Image Repository
 
 ## Introduction
