@@ -1,3 +1,221 @@
+GradleVersion.getNextMajor()
+
+
+> Task :compileJava UP-TO-DATE
+The GradleVersion.getNextMajor() method has been deprecated. This is scheduled to be removed in Gradle 9.0. Consult the upgrading guide for further information: https://docs.gradle.org/8.1.1/userguide/upgrading_version_7.html#org_gradle_util_reports_deprecations
+
+> Task :distTar FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem was found with the configuration of task ':distTar' (type 'Tar').
+  - Gradle detected a problem with the following location: 'C:\Users\j245\OneDrive - Sun Life Financial\AEP\Work\Template-Creator\aep-template-creator\build\libs\aep-template-creator.war'.
+
+    Reason: Task ':distTar' uses this output of task ':bootWar' without declaring an explicit or implicit dependency. This can lead to incorrect results being produced, depending on what order the tasks are executed.
+
+    Possible solutions:
+      1. Declare task ':bootWar' as an input of ':distTar'.
+      2. Declare an explicit dependency on ':bootWar' from ':distTar' using Task#dependsOn.
+      3. Declare an explicit dependency on ':bootWar' from ':distTar' using Task#mustRunAfter.
+
+    Please refer to https://docs.gradle.org/8.1.1/userguide/validation_problems.html#implicit_dependency for more details about this problem.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 8s
+6 actionable tasks: 4 executed, 2 up-to-date
+
+
+
+
+gradle.properties
+
+artifactory_contexturl=https://artifactory.sunlifecorp.com/artifactory
+version=0.0.1-SNAPSHOT
+org.gradle.jvmargs=-Xmx1024m
+#External Dependencies
+artifactoryPluginVersion=4.15.1
+nebulaReleasePluginVersion=15.3.1
+sonarPlugin=2.8
+springBootVersion=2.6.6
+springDependencyManagementVersion=1.0.8.RELEASE
+#libertyPluginVersion=2.7
+#jinjaVariablePlugin=1.1.0
+mapstructVersion=1.3.0.Final
+parentVersion=1.0.0
+springDependencyPlugin=1.0.10.RELEASE
+
+
+build.gradle
+
+plugins {
+    id "java"
+    id "war"
+    id "java-library"
+    id "maven-publish"
+    id "distribution"
+    id "org.sonarqube"
+    id "org.springframework.boot"
+    id "io.spring.dependency-management"
+    id "com.jfrog.artifactory"
+	id "nebula.release"
+}
+
+ext['log4j2.version'] = '2.17.1'
+
+apply plugin: "org.sonarqube"
+
+group 'ca.sunlife.aep'
+
+//version "${version}"
+sourceCompatibility = 1.8
+
+compileJava {
+    options.incremental = false
+    options.compilerArgs = [
+            "-Amapstruct.defaultComponentModel=spring"
+    ]
+}
+
+springBoot {    
+    buildInfo() 
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+artifactory{
+    publish{
+        defaults{
+            publications("publishArtifacts")
+        }
+    }
+}
+
+nebulaRelease{
+    releaseBranchPatterns = [/master/, /HEAD/, /main/, /(release(-|\/))?\d+(\.\d+)?\.x/, /v?\d+\.\d+\.\d+/, /develop/]
+}
+
+release{
+    defaultVersionStrategy = nebula.plugin.release.git.opinion.Strategies.SNAPSHOT
+}
+
+repositories {
+    maven {
+        url "${artifactory_contexturl}/remote-repos"
+    }
+    maven {
+        url "${artifactory_contexturl}/libs-release"
+    }
+    maven {
+        url "${artifactory_contexturl}/ext-release"
+    }
+    maven {
+        url "${artifactory_contexturl}/plugins-release"
+    }
+    mavenCentral()
+}
+
+bootWar {
+	enabled = true
+    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
+}
+
+war{
+	enabled = false
+}
+
+distributions {
+    main {
+        contents {
+            into("${project.name}"){
+                from "${buildDir}/libs/${project.name}.war"
+            }
+            into("${project.name}"){
+                from "src/main/liberty/config"
+            }
+            into("vars"){
+                from "src/main/properties/$project.name/vars"
+            }
+            from "${buildDir}/tmp/properties/${project.name}.zip"
+        }
+    }
+}
+
+distZip {
+    eachFile { file ->
+        String path = file.relativePath
+        file.setPath(path.substring(path.indexOf("/")+1,path.length()))
+    }
+    includeEmptyDirs = false
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation('org.springframework:spring-web')
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2")
+    implementation("org.projectlombok:lombok")
+    implementation("org.apache.httpcomponents:httpclient:4.5")
+    implementation("org.apache.commons:commons-lang3:3.0")
+    implementation("commons-configuration:commons-configuration:1.7")
+    implementation("org.apache.httpcomponents:httpmime:4.3.1")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf:2.3.4.RELEASE")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.65.01")
+    implementation("commons-codec:commons-codec:1.10")
+    implementation("org.jsoup:jsoup:1.13.1") 
+    annotationProcessor("org.projectlombok:lombok")
+    implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+    annotationProcessor("org.mapstruct:mapstruct-processor:${mapstructVersion}")
+    implementation('org.springframework.boot:spring-boot-starter-actuator')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.boot:spring-boot-starter-data-rest')
+	implementation('org.springframework.boot:spring-boot-starter-security')
+	implementation('org.springframework.security:spring-security-test')
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation('org.postgresql:postgresql')
+    compileOnly("org.springframework.boot:spring-boot-devtools")
+    runtimeOnly ('org.postgresql:postgresql')
+    providedRuntime ('org.springframework.boot:spring-boot-starter-tomcat')
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation('org.springframework.boot:spring-boot-starter-test'){
+        exclude group: 'junit', module: 'junit'
+    }
+    implementation "org.sonarqube:org.sonarqube.gradle.plugin:2.8"
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing{
+    publications{
+        publishArtifacts(MavenPublication){
+        	artifactId 'aep-template-creator'
+            artifact source: distZip, classifier: "dist", extension: "zip"
+        }
+    }
+}
+
+if(hasProperty('profile')){
+    apply from:"${profile}-profile.gradle"
+}
+
+
+
+
+
+
 distributionBase=GRADLE_USER_HOME
 distributionPath=wrapper/dists
 distributionUrl=https://artifactory.sunlifecorp.com/artifactory/gradle-services/distributions/gradle-6.8.3-bin.zip
