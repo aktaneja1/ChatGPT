@@ -1,3 +1,22 @@
+* What went wrong:
+A problem was found with the configuration of task ':distTar' (type 'Tar').
+  - Gradle detected a problem with the following location: 'C:\Users\j245\OneDrive - Sun Life Financial\AEP\Work\Template-Creator\aep-template-creator\build\libs\aep-template-creator.war'.
+
+    Reason: Task ':distTar' uses this output of task ':bootWar' without declaring an explicit or implicit dependency. This can lead to incorrect results being produced, depending on what order the tasks are executed.
+
+    Possible solutions:
+      1. Declare task ':bootWar' as an input of ':distTar'.
+      2. Declare an explicit dependency on ':bootWar' from ':distTar' using Task#dependsOn.
+      3. Declare an explicit dependency on ':bootWar' from ':distTar' using Task#mustRunAfter.
+
+    Please refer to https://docs.gradle.org/8.1.1/userguide/validation_problems.html#implicit_dependency for more details about this problem.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+
 A problem occurred evaluating root project 'aep-template-creator'.
 > Could not find method C:\Users\j245\OneDrive - Sun Life Financial\AEP\Work\Template-Creator\aep-template-creator\build/tmp/properties/aep-template-creator.zip() for arguments [build_8eud1v7eorz22orzd4bqeguog$_run_closure10$_closure21$_closure22$_closure26@4fdf3586] on object of type org.gradle.api.internal.file.copy.DefaultCopySpec_Decorated.
 
