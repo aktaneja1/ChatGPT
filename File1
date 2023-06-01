@@ -1,3 +1,24 @@
+distributions {
+    main {
+        contents {
+            into("${project.name}"){
+                from "${buildDir}/libs/${project.name}.war"
+            }
+            into("${project.name}"){
+                from "src/main/liberty/config"
+            }
+            into("vars"){
+                from "src/main/properties/$project.name/vars"
+            }
+            from("${buildDir}/tmp/properties/${project.name}.zip") {
+                into("") // Explicitly specify the destination directory for the file
+            }
+        }
+    }
+}
+
+
+
 GradleVersion.getNextMajor()
 
 
