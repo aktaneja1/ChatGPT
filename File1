@@ -1,3 +1,7 @@
+A problem occurred evaluating root project 'aep-template-creator'.
+> Could not find method C:\Users\j245\OneDrive - Sun Life Financial\AEP\Work\Template-Creator\aep-template-creator\build/tmp/properties/aep-template-creator.zip() for arguments [build_8eud1v7eorz22orzd4bqeguog$_run_closure10$_closure21$_closure22$_closure26@4fdf3586] on object of type org.gradle.api.internal.file.copy.DefaultCopySpec_Decorated.
+
+
 distributions {
     main {
         contents {
