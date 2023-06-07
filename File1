@@ -1,3 +1,85 @@
+def slfUser() {
+
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
+
+    {
+
+        sh '''
+
+        aws secretsmanager get-secret-value --secret-id poc/mongodb --query "SecretString" --region ca-central-1 --output text > slfuser
+
+        sed 's/{"slfuser":"//g' slfuser > slfuser.txt
+
+        sed 's/"}//g' slfuser.txt > packer/slfuser
+
+        '''      
+
+    }
+
+
+}
+
+ 
+
+return this
+
+
+
+def slfUser() {
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
+    {
+
+        sh '''
+
+        aws secretsmanager get-secret-value --secret-id poc/mongodb --query "SecretString" --region ca-central-1 --output text > slfuser
+
+        sed 's/{"slfuser":"//g' slfuser > slfuser.txt
+
+        sed 's/"}//g' slfuser.txt > packer/slfuser
+
+        '''      
+
+    }
+}
+
+pipeline {
+    agent { label 'terraform-1.0.0' }
+
+    stages {
+        stage('build') {
+            environment {
+                AWS_POLL_DELAY_SECONDS = 10
+                AWS_MAX_ATTEMPTS = 7200
+				IdleTimeout = 7200000
+            }
+            steps {                
+
+				node("terraform-1.0.0") { 
+					linting()
+				}
+				
+				//static_code_analysis()
+				
+				node("packer-1.7.10") { 
+
+                        script { 
+                            slfUser() 
+                            sh '''
+                            cd packer
+                            ls -lrt
+                            '''   
+                        }                    
+                    machine_image_build()
+					machine_image_validate()
+				}
+        }
+    }
+}
+}
+
+
+
+
 FAILURE: Build failed with an exception.
 
 * What went wrong:
