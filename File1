@@ -1,3 +1,5 @@
+execute_command = "{{ .Vars }} sudo -E -S sh '{{ .Path }}'"
+
 def slfUser() {
 
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
