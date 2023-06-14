@@ -1,3 +1,147 @@
+main.yml
+
+---
+- name: "Read cmdb_ci_server information from Service Now"
+  no_log: true
+  uri:
+    url: "{{ v_aep_dev_cmdb_ci_server_url }}"
+    user: "{{ v_aepSnowUser }}"
+    password: "{{ v_aepSnowPass }}"
+    method: GET
+  register: aep_cmdb_ci
+
+- name: "Read aep server_build information from Service Now"
+  no_log: true
+  uri:
+    url: "{{ v_aep_dev_server_build_url }}"
+    user: "{{ v_aepSnowUser }}"
+    password: "{{ v_aepSnowPass }}"
+    method: GET
+  register: aep_server_build
+
+- set_fact:
+    AEP_LOB_NAME: "{{ v_aepLob }}"
+    AEP_PROJECT_NAME: "{{ aep_server_build.json.result[0].u_project_name | default('null') }}"
+    AEP_APP_NAME: "{{ aep_server_build.json.result[0].u_application_usage | default('null') }}"
+    AEP_ENV_NAME: "AEP Dev"
+    AEP_SERVER_NAME: "{{ aep_server_build.json.result[0].u_host_name | default(v_aepServer) }}"
+    AEP_SERVER_STATUS: "{{ aep_cmdb_ci.json.result[0].hardware_status  | default('null') }}"
+    AEP_SERVER_PROV_DT: "{{ aep_cmdb_ci.json.result[0].sys_created_on | default('null') }}"
+    AEP_SERVER_DECOMM_DT: "{{ aep_cmdb_ci.json.result[0].u_host_decom_date | default('null') }}"
+    AEP_SERVER_DURATION: "{{ aep_server_build.json.result[0].u_build_duration | default('null') }}"
+    AEP_PATTERN_LOB: "{{ v_aepLob }}"
+    AEP_PATTERN_NAME: "{{ aep_server_build.json.result[0].u_application_name_string | default('null')  }}"
+    AEP_SAVINGS_LOB: "{{ v_aepLob }}"
+    AEP_SAVINGS_PROJECT: "{{ aep_server_build.json.result[0].u_project_name | default('null') }}"
+    AEP_SAVINGS_COST: "{{ aep_server_build.json.result[0].u_cost_centre | default('183402') }}"
+    AEP_SV_PROJECT: "NA"
+    AEP_SV_VS_STATUS: "NA"
+    AEP_SV_VS_COUNT: "NA"
+    AEP_INC_NUM: "NA"
+    AEP_INC_APP_NAME: "NA"
+    AEP_INC_SERVER: "NA"
+    AEP_CC_NUM: "NA"
+    AEP_CC_OWNER: "NA"
+
+- name: Copy Python script to temporary execution location
+  template:
+    src: "{{ aepSql_script }}"
+    dest: ./tmp
+    mode: 0755
+
+- name: "Execute AEP Py Script"
+  shell: |
+    ./tmp/{{ aepSql_script }} "{{ AEP_LOB_NAME }}" "{{ AEP_PROJECT_NAME }}" "{{ AEP_APP_NAME }}" "{{ AEP_ENV_NAME }}" "{{ AEP_SERVER_NAME }}" "{{ AEP_SERVER_STATUS }}" "{{ AEP_SERVER_PROV_DT }}" "{{ AEP_SERVER_DECOMM_DT }}" "{{ AEP_SERVER_DURATION }}" "{{ AEP_PATTERN_LOB }}" "{{ AEP_PATTERN_NAME }}" "{{ AEP_SAVINGS_LOB }}" "{{ AEP_SAVINGS_PROJECT }}" {{ AEP_SAVINGS_COST }} "{{ AEP_SV_PROJECT }}" "{{ AEP_SV_VS_STATUS }}" {{ AEP_SV_VS_COUNT }} {{ AEP_INC_NUM }} "{{ AEP_INC_APP_NAME }}" "{{ AEP_INC_SERVER }}" {{ AEP_CC_NUM }} "{{ AEP_CC_OWNER }}"
+
+
+aep_mssql.py.j2
+
+#!/usr/bin/env python
+
+###############
+# Dependencies
+###############
+try:
+
+  import sys
+  import os
+  import socket
+  import pyodbc
+  import datetime
+
+except ImportError as err:
+  print('ERROR: Python modules verification failed. Error is: ' + err)
+  sys.exit(2)
+
+###########################
+# Ansible passed variables
+###########################
+server = '{{ aep_tableau_dbHost }}'
+database = '{{ aep_tableau_db }}'
+username = '{{ aep_tableau_dbUser }}'
+password = '{{ aep_tableau_dbPass }}'
+
+AEP_LOB_NAME = sys.argv[1]
+AEP_PROJECT_NAME = sys.argv[2]
+AEP_APP_NAME = sys.argv[3]
+AEP_ENV_NAME = sys.argv[4]
+AEP_SERVER_NAME = sys.argv[5]
+AEP_SERVER_STATUS = sys.argv[6]
+AEP_SERVER_PROV_DT = sys.argv[7]
+AEP_SERVER_DECOMM_DT = sys.argv[8]
+AEP_SERVER_DURATION = sys.argv[9]
+AEP_TIMESTAMP = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+AEP_PATTERN_LOB = sys.argv[10]
+AEP_PATTERN_NAME = sys.argv[11]
+AEP_SAVINGS_LOB = sys.argv[12]
+AEP_SAVINGS_PROJECT = sys.argv[13]
+AEP_SAVINGS_COST = sys.argv[14]
+AEP_SV_PROJECT = sys.argv[15]
+AEP_SV_VS_STATUS = sys.argv[16]
+AEP_SV_VS_COUNT = sys.argv[17]
+AEP_INC_NUM = sys.argv[18]
+AEP_INC_APP_NAME = sys.argv[19]
+AEP_INC_SERVER = sys.argv[20]
+AEP_CC_NUM = sys.argv[21]
+AEP_CC_OWNER = sys.argv[22]
+
+####################################################
+# Connect and query into
+####################################################
+drivers = [item for item in pyodbc.drivers()]
+driver = drivers[-1]
+print("driver:{}".format(driver))
+
+cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+cursor = cnxn.cursor()
+
+cursor.execute("SELECT @@version;") 
+row = cursor.fetchone() 
+while row: 
+    print(row[0])
+    row = cursor.fetchone()
+
+aepInsert = cursor.execute("""
+INSERT INTO dbo.AEP_TABLEAU_DATA (AEP_LOB_NAME, AEP_PROJECT_NAME, AEP_APP_NAME,AEP_ENV_NAME,AEP_SERVER_NAME,AEP_SERVER_STATUS,AEP_SERVER_PROV_DT,AEP_SERVER_DECOMM_DT,AEP_SERVER_DURATION,AEP_TIMESTAMP,AEP_PATTERN_LOB,AEP_PATTERN_NAME,AEP_SAVINGS_LOB,AEP_SAVINGS_PROJECT,AEP_SAVINGS_COST,AEP_SV_PROJECT,AEP_SV_VS_STATUS,AEP_SV_VS_COUNT,AEP_INC_NUM,AEP_INC_APP_NAME,AEP_INC_SERVER,AEP_CC_NUM,AEP_CC_OWNER)
+VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+AEP_LOB_NAME, AEP_PROJECT_NAME, AEP_APP_NAME,AEP_ENV_NAME,AEP_SERVER_NAME,AEP_SERVER_STATUS,AEP_SERVER_PROV_DT,AEP_SERVER_DECOMM_DT,AEP_SERVER_DURATION,AEP_TIMESTAMP,AEP_PATTERN_LOB,AEP_PATTERN_NAME,AEP_SAVINGS_LOB,AEP_SAVINGS_PROJECT,AEP_SAVINGS_COST,AEP_SV_PROJECT,AEP_SV_VS_STATUS,AEP_SV_VS_COUNT,AEP_INC_NUM,AEP_INC_APP_NAME,AEP_INC_SERVER,AEP_CC_NUM,AEP_CC_OWNER).rowcount
+
+cnxn.commit()
+print("Rows inserted: " + str(aepInsert))
+
+
+vars.main.yml
+
+v_aepServer: "{{ ev_targets | mandatory }}"
+v_aepLob: "{{ ev_aepLob | mandatory }}"
+v_aep_dev_cmdb_ci_server_url: "{{ v_ServiceNowApiURL }}/now/table/cmdb_ci_server?sysparm_display_value=true&u_aep_env=AEP%20Dev&name={{ v_aepServer }}"
+v_aep_dev_server_build_url: "{{ v_ServiceNowApiURL }}/now/table/u_server_build?sysparm_query=u_request_item.cat_item%3Df6edfa901b99a41087b842a7bc4bcbc6&sysparm_display_value=true&u_host_name={{ v_aepServer }}"
+aepSql_script: "aep_mssql.py.j2"
+aep_tableau_dbHost: "sv0a0069.sunlifecorp.com,50013"
+aep_tableau_dbUser: "microdev"
+
+
+
 Branch event
 [JTE] pipeline_config.groovy/pipeline_config.groovy does not exist. (show)
 [JTE] Obtained Pipeline Configuration File (show)
