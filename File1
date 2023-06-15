@@ -1,3 +1,6 @@
+ADD ../../*.jar /tmp
+
+
 ARG BUILD_ENV=local
 
 FROM prod-dtr-ca.sunlifecorp.com/whs/tomcatbase:2.3.4.release-20201015141323 as base
