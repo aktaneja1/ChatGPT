@@ -1,3 +1,48 @@
+Led and successfully implemented end-to-end DevOps processes and practices in a real-time project, utilizing a combination of the following tools:
+
+Scripting Language: Leveraged Groovy scripting language to automate deployment processes and streamline operations.
+Demonstrated expertise in infrastructure provisioning and configuration management using the following tools:
+
+Infra Tools: Designed and implemented infrastructure solutions using Packer, Ansible, Terraform, Kubernetes, and Docker.
+Infra Lang: Proficiently utilized HCL2 and YAML to define infrastructure as code (IaC) for improved scalability and manageability.
+Spearheaded development activities by utilizing the following programming languages and version control systems:
+
+Programming Language: Leveraged Java and Python to develop custom tools and applications, enhancing automation and integration capabilities.
+CI/CD Tools: Implemented robust CI/CD pipelines using Jenkins, GIT, and Bitbucket for efficient software delivery and collaboration.
+Ensured seamless data management and performance optimization through the following capabilities:
+
+Database: Leveraged SQL to efficiently manage and manipulate relational databases, ensuring data integrity and performance.
+Leveraged cloud services to architect and manage scalable and reliable infrastructure:
+
+Cloud: Utilized AWS to design, deploy, and manage cloud-based infrastructure, ensuring high availability and scalability.
+Created comprehensive monitoring and visualization solutions for effective infrastructure management:
+
+Dashboard: Implemented Grafana dashboards to provide real-time visibility into system health, performance, and metrics.
+Automated testing processes and ensured quality assurance through the following tools:
+
+Automation Tools: Utilized Selenium, Appium, and TOSCA for automated testing of web and mobile applications, ensuring reliable software delivery.
+API Tools: Employed Postman, Ready API, and Rest Assured for testing and validating APIs, ensuring their functionality and performance.
+Managed mobile application testing across various devices and platforms:
+
+Device Farm: Utilized Mobile Center to manage and test mobile applications across a wide range of devices and platforms.
+Demonstrated versatility in working with multiple platforms and environments:
+
+Platform: Proficiently managed deployments on both Windows and Linux platforms, ensuring compatibility and stability.
+Possessed a solid understanding of network and security fundamentals, with experience in handling real-time streaming data using Kafka.
+
+Effectively tracked issues and managed projects using Jira, ensuring timely resolution and smooth project delivery.
+
+These pointers reflect your experience as a DevOps Lead and highlight your ability to successfully implement and leverage various tools in real-time projects.
+
+
+
+
+
+
+
+
+
+
 ADD ../../*.jar /tmp
 
 
