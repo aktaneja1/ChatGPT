@@ -1,3 +1,38 @@
+- set_fact:
+    AEP_LOB_NAME: "{{ v_aepLob }}"
+    AEP_PROJECT_NAME: "{{ aep_server_build.json.result[0].u_project_name | default('null') }}"
+    AEP_APP_NAME: "{{ aep_server_build.json.result[0].u_application_usage | default('null') }}"
+    AEP_ENV_NAME: "AEP Dev"
+    AEP_SERVER_NAME: "{{ aep_server_build.json.result[0].u_host_name | default(v_aepServer) }}"
+    AEP_SERVER_STATUS: >-
+      {% if aep_cmdb_ci.json.result[0].hardware_status == "Installed" %}
+        In-Use
+      {% else %}
+        {{ aep_cmdb_ci.json.result[0].hardware_status | default('null') }}
+      {% endif %}
+    AEP_SERVER_PROV_DT: "{{ aep_cmdb_ci.json.result[0].sys_created_on | default('null') }}"
+    AEP_SERVER_DECOMM_DT: "{{ aep_cmdb_ci.json.result[0].u_host_decom_date | default('null') }}"
+    AEP_SERVER_DURATION: "{{ aep_server_build.json.result[0].u_build_duration | default('null') }}"
+    AEP_PATTERN_LOB: "{{ v_aepLob }}"
+    AEP_PATTERN_NAME: "{{ aep_server_build.json.result[0].u_application_name_string | default('null') }}"
+    AEP_SAVINGS_LOB: "{{ v_aepLob }}"
+    AEP_SAVINGS_PROJECT: "{{ aep_server_build.json.result[0].u_project_name | default('null') }}"
+    AEP_SAVINGS_COST: "{{ aep_server_build.json.result[0].u_cost_centre | default('183402') }}"
+    AEP_SV_PROJECT: "NA"
+    AEP_SV_VS_STATUS: "NA"
+    AEP_SV_VS_COUNT: "NA"
+    AEP_INC_NUM: "NA"
+    AEP_INC_APP_NAME: "NA"
+    AEP_INC_SERVER: "NA"
+    AEP_CC_NUM: "NA"
+    AEP_CC_OWNER: "NA"
+
+
+
+
+
+
+
 Led DevOps initiatives and served as the primary point of contact for all DevOps-related activities, overseeing a team of engineers and ensuring seamless collaboration across departments.
 
 Designed and implemented end-to-end DevOps processes and practices, resulting in improved software delivery speed, quality, and reliability.
