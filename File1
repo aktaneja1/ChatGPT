@@ -1,3 +1,87 @@
+The task includes an option with an undefined variable. The error was: 'aep' is undefined\n\nThe error appears to be in '/ansible/tower/tmpjobs/bwrap_2419535_fx17rz8s/awx_2419535_j5cxobw4/project/roles/server_decommissioning/tasks/main.yml': line 2, column 3, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n---\n- name: \"Read cmdb_ci_server information from Service Now\"\n  ^ here\n"
+
+---
+- name: "Read cmdb_ci_server information from Service Now"
+  no_log: false
+  uri:
+    url: "{{ v_aep_dev_cmdb_ci_server_url }}"
+    user: "{{ aep_tableau_dbUser }}"
+    password: "{{aep-serviceNow-password}}"
+    method: GET
+  register: aep_cmdb_ci
+
+- name: "Read aep server_build information from Service Now"
+  no_log: false
+  uri:
+    url: "{{ v_aep_dev_server_build_url }}"
+    user: "{{ aep_tableau_dbUser }}"
+    password: "{{aep-serviceNow-password}}"
+    method: GET
+  register: aep_server_build
+
+- set_fact:
+    AEP_LOB_NAME: "{{ v_aepLob }}"
+    AEP_PROJECT_NAME: "{{ aep_server_build.json.result[0].u_project_name | default('null') }}"
+    AEP_APP_NAME: "{{ aep_server_build.json.result[0].u_application_usage | default('null') }}"
+    AEP_ENV_NAME: "AEP Dev"
+    AEP_SERVER_NAME: "{{ aep_server_build.json.result[0].u_host_name | default(v_aepServer) }}"
+    AEP_SERVER_STATUS: "Decommissioned"
+    AEP_SERVER_PROV_DT: "{{ aep_cmdb_ci.json.result[0].sys_created_on | default('null') }}"
+    AEP_SERVER_DECOMM_DT: "{{ aep_cmdb_ci.json.result[0].u_host_decom_date | default('null') }}"
+    AEP_SERVER_DURATION: "{{ aep_server_build.json.result[0].u_build_duration | default('null') }}"
+    AEP_PATTERN_LOB: "{{ v_aepLob }}"
+    AEP_PATTERN_NAME: "{{ aep_server_build.json.result[0].u_application_name_string | default('null')  }}"
+    AEP_SAVINGS_LOB: "{{ v_aepLob }}"
+    AEP_SAVINGS_PROJECT: "{{ aep_server_build.json.result[0].u_project_name | default('null') }}"
+    AEP_SAVINGS_COST: "{{ aep_server_build.json.result[0].u_cost_centre | default('183402') }}"
+    AEP_SV_PROJECT: "NA"
+    AEP_SV_VS_STATUS: "NA"
+    AEP_SV_VS_COUNT: "NA"
+    AEP_INC_NUM: "NA"
+    AEP_INC_APP_NAME: "NA"
+    AEP_INC_SERVER: "NA"
+    AEP_CC_NUM: "NA"
+    AEP_CC_OWNER: "NA"
+
+- name: Copy Python script to temporary execution location
+  template:
+    src: "{{ aepSql_script }}"
+    dest: ./tmp
+    mode: 0755
+
+- name: "Execute AEP Py Script"
+  shell: |
+    ./tmp/{{ aepSql_script }} "{{ AEP_LOB_NAME }}" "{{ AEP_PROJECT_NAME }}" "{{ AEP_APP_NAME }}" "{{ AEP_ENV_NAME }}" "{{ AEP_SERVER_NAME }}" "{{ AEP_SERVER_STATUS }}" "{{ AEP_SERVER_PROV_DT }}" "{{ AEP_SERVER_DECOMM_DT }}" "{{ AEP_SERVER_DURATION }}" "{{ AEP_PATTERN_LOB }}" "{{ AEP_PATTERN_NAME }}" "{{ AEP_SAVINGS_LOB }}" "{{ AEP_SAVINGS_PROJECT }}" {{ AEP_SAVINGS_COST }} "{{ AEP_SV_PROJECT }}" "{{ AEP_SV_VS_STATUS }}" {{ AEP_SV_VS_COUNT }} {{ AEP_INC_NUM }} "{{ AEP_INC_APP_NAME }}" "{{ AEP_INC_SERVER }}" {{ AEP_CC_NUM }} "{{ AEP_CC_OWNER }}"
+
+
+
+v_aepServer: "{{ ev_targets | mandatory }}"
+v_aepLob: "{{ ev_aepLob | mandatory }}"
+v_aep_dev_cmdb_ci_server_url: "https://sunlife.service-now.com/api/now/table/cmdb_ci_server?sysparm_display_value=true&u_aep_env=AEP%20Dev&name={{ v_aepServer }}"
+v_aep_dev_server_build_url: "https://sunlife.service-now.com/api/now/table/u_server_build?sysparm_query=u_request_item.cat_item%3Df6edfa901b99a41087b842a7bc4bcbc6&sysparm_display_value=true&u_host_name={{ v_aepServer }}"
+aepSql_script: "aep_mssql.py.j2"
+aep_tableau_dbHost: "sv0a0069.sunlifecorp.com,50013"
+aep_tableau_dbUser: "microdev"
+aep-serviceNow-password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61643937343963666262636561643431613732663735313766333664663238363439333766333538
+          6234613163363132666262663664393233626539333762390a383964643039303337336436363861
+          31646531336335343330316463353436366162363233363436383835666231616665396366343062
+          6332316663643462330a376465303165366133333731393535303331623832663063643266313437
+          3665
+
+
+
+
+
+
+
+
+
+
+
+
+
 podman run -p 9080:9080 --add-host=host.podman.internal:host-gateway -v /tmp/value.yml:/config/value.yml prod-dtr-ca.sunlifecorp.com/eadpapiops/light-proxy:2.7.1
 Error: invalid IP address in add-host: "host-gateway"
 
