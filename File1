@@ -1,3 +1,6 @@
+podman run -p 9080:9080 --add-host=host.podman.internal:host-gateway -v /tmp/value.yml:/config/value.yml prod-dtr-ca.sunlifecorp.com/eadpapiops/light-proxy:2.7.1
+Error: invalid IP address in add-host: "host-gateway"
+
 ERROR! couldn't resolve module/action 'aws_secretsmanager_facts'. This often indicates a misspelling, missing collection, or incorrect module path.
 
 
