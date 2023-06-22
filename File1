@@ -1,3 +1,6 @@
+ERROR! couldn't resolve module/action 'aws_secretsmanager_facts'. This often indicates a misspelling, missing collection, or incorrect module path.
+
+
 - set_fact:
     AEP_LOB_NAME: "{{ v_aepLob }}"
     AEP_PROJECT_NAME: "{{ aep_server_build.json.result[0].u_project_name | default('null') }}"
