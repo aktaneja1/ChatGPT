@@ -1,3 +1,23 @@
+- name: Copy Python script to temporary execution location
+    template:
+      src: "{{ aepSql_script }}"
+      dest: ./tmp
+      mode: 0755
+
+  - name: "Execute AEP Py Script"
+    shell: |
+      ./tmp/{{ aepSql_script }} "{{ AEP_LOB_NAME }}" "{{ AEP_PROJECT_NAME }}" "{{ AEP_APP_NAME }}" "{{ AEP_ENV_NAME }}" "{{ AEP_SERVER_NAME }}" "{{ AEP_SERVER_STATUS }}" "{{ AEP_SERVER_PROV_DT }}" "{{ AEP_SERVER_DECOMM_DT }}" "{{ AEP_SERVER_DURATION }}" "{{ AEP_PATTERN_LOB }}" "{{ AEP_PATTERN_NAME }}" "{{ AEP_SAVINGS_LOB }}" "{{ AEP_SAVINGS_PROJECT }}" {{ AEP_SAVINGS_COST }} "{{ AEP_SV_PROJECT }}" "{{ AEP_SV_VS_STATUS }}" {{ AEP_SV_VS_COUNT }} {{ AEP_INC_NUM }} "{{ AEP_INC_APP_NAME }}" "{{ AEP_INC_SERVER }}" {{ AEP_CC_NUM }} "{{ AEP_CC_OWNER }}"
+
+aep_mssql.py.j2
+
+
+TASK [server_decommissioning : Execute AEP Py Script] **************************
+fatal: [localhost]: FAILED! => {"changed": true, "cmd": "./tmp/aep_mssql.py.j2 \"MDPowers\" \"null\" \"null\" \"AEP Dev\" \"cl0a2327\" \"Decommissioned\" \"null\" \"null\" \"null\" \"MDPowers\" \"null\" \"MDPowers\" \"null\" 183402 \"NA\" \"NA\" NA NA \"NA\" \"NA\" NA \"NA\"", "delta": "0:00:00.007823", "end": "2023-06-23 06:50:44.177110", "msg": "non-zero return code", "rc": 126, "start": "2023-06-23 06:50:44.169287", "stderr": "/bin/sh: ./tmp/aep_mssql.py.j2: Not a directory", "stderr_lines": ["/bin/sh: ./tmp/aep_mssql.py.j2: Not a directory"], "stdout": "", "stdout_lines": []}
+
+
+
+
+
 The task includes an option with an undefined variable. The error was: 'aep' is undefined\n\nThe error appears to be in '/ansible/tower/tmpjobs/bwrap_2419535_fx17rz8s/awx_2419535_j5cxobw4/project/roles/server_decommissioning/tasks/main.yml': line 2, column 3, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n---\n- name: \"Read cmdb_ci_server information from Service Now\"\n  ^ here\n"
 
 ---
