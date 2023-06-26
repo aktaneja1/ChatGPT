@@ -1,3 +1,21 @@
+aepUpdate = cursor.execute("""
+UPDATE dbo.AEP_TABLEAU_DATA
+SET AEP_SERVER_STATUS = ?
+WHERE AEP_LOB_NAME = ? AND AEP_SERVER_NAME = ?
+""",
+aepServerStatus, aepServerLOB, aepServerName).rowcount
+
+
+
+In this query, the ? placeholders are used to pass the parameter values to the query. The values aepServerStatus, aepServerLOB, and aepServerName are provided as arguments to the execute function.
+
+Make sure to replace the aepServerStatus, aepServerLOB, and aepServerName variables with the appropriate values according to your use case before executing the script.
+
+
+
+
+
+
 #!/usr/bin/env python
 
 ###############
