@@ -1,3 +1,56 @@
+#!/usr/bin/env python
+
+###############
+# Dependencies
+###############
+try:
+
+  import sys
+  import os
+  import socket
+  import pyodbc
+  import datetime
+
+except ImportError as err:
+  print('ERROR: Python modules verification failed. Error is: ' + err)
+  sys.exit(2)
+
+###########################
+# Ansible passed variables
+###########################
+server = '{{ aep_tableau_dbHost }}'
+database = '{{ aep_tableau_db }}'
+username = '{{ aep_tableau_dbUser }}'
+password = '{{ aep_tableau_dbPass }}'
+aepServerName = '{{ v_aepServer }}'
+aepServerLOB = '{{ v_aepLob }}'
+aepServerStatus = '{{ v_aepServerStatus }}'
+
+####################################################
+# Connect and query into
+####################################################
+drivers = [item for item in pyodbc.drivers()]
+driver = drivers[-1]
+print("driver:{}".format(driver))
+
+cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+cursor = cnxn.cursor()
+
+cursor.execute("SELECT @@version;") 
+row = cursor.fetchone() 
+while row: 
+    print(row[0])
+    row = cursor.fetchone()
+
+aepUpdate = cursor.execute(UPDATE dbo.AEP_TABLEAU_DATA SET AEP_SERVER_STATUS = $aepServerStatus WHERE AEP_LOB_NAME = $aepServerLOB AND AEP_SERVER_NAME = $aepServerStatus).rowcount
+
+cnxn.commit()
+print("Rows Updated: " + str(aepUpdate))
+
+
+
+
+
 - name: Copy Python script to temporary execution location
     template:
       src: "{{ aepSql_script }}"
