@@ -1,5 +1,12 @@
 sudo -H pip3 install --upgrade pip --index-url=https://pypi.org/simple/
 
+ sudo yum upgrade python3-pip
+
+sudo pip3 install podman-compose 
+
+
+yum python3-pip install podman-compose
+
 
 sudo -H pip3 install --upgrade pip
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
