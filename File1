@@ -1,3 +1,6 @@
+sudo -H pip3 install --upgrade pip --index-url=https://pypi.org/simple/
+
+
 sudo -H pip3 install --upgrade pip
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
 Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectTimeoutError(<pip._vendor.urllib3.connection.VerifiedHTTPSConnection object at 0x7fc6e1281b70>, 'Connection to pypi.python.org timed out. (connect timeout=15)')': /simple/pip/
