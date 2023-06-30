@@ -1,3 +1,17 @@
+version: '3'
+services:
+  light-proxy:
+    image: prod-dtr-ca.sunlifecorp.com/eadpapiops/light-proxy:2.7.1
+    ports:
+      - '9080:9080'
+    volumes:
+      - /tmp/config:/home/default/config
+      - ./config:/config
+    command: /bin/bash -c "java -Dlight-4j-config-dir=/config -Dlogback.configurationFile=/config/logback.xml -jar server.jar"
+    network_mode: host
+
+
+
 
 version: '2'
 services:
