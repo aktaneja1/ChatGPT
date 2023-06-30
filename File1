@@ -1,3 +1,30 @@
+
+version: '2'
+services:
+        proxy:
+                image: prod-dtr-ca.sunlifecorp.com/eadpapiops/light-proxy:2.7.1
+                ports:
+                        - "9080:9080"
+        api:
+                image: prod-dtr-ca.sunlifecorp.com/innersource/innersource-portal-api
+                environment:
+                        - JVM_ARGS="-Xms512m -Xmx700m -Dhttp.proxyHost=proxy-mwg-http.ca.sunlife -Dhttp.proxyPort=8080 -Dhttps.proxyHost=proxy-mwg-http.ca.sunlife -Dhttps.proxyPort=8443 -Dhttp.nonProxyHosts='*.sunlifecorp.com|*.ca.sunlife|*.local'"
+
+        ui:
+                image: prod-dtr-ca.sunlifecorp.com/innersource/innersource-portal-ui@sha256:0ce5c8e4e0019412da4d664c1b66a9ede4bd462bd5231de025ad17afeb438afb
+
+
+
+
+java -Dlight-4j-config-dir=/config -Dlogback.configurationFile=/config/logback.xml -jar server.jar
+
+
+podman run -it -p 9080:9080 --network=host -v /tmp/config:/home/default/config prod-dtr-ca.sunlifecorp.com/eadpapiops/light-proxy:2.7.1 /bin/bash
+
+
+
+
+
 sudo -H pip3 install --upgrade pip --index-url=https://pypi.org/simple/
 
  sudo yum upgrade python3-pip
