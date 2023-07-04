@@ -3,6 +3,21 @@ services:
   api:
     image: local/innersource-api
     environment:
+      - JVM_ARGS: >
+          -Xms512m
+          -Xmx700m
+          -Dhttp.proxyHost=proxy-mwg-http.ca.sunlife
+          -Dhttp.proxyPort=8080
+          -Dhttps.proxyHost=proxy-mwg-http.ca.sunlife
+          -Dhttps.proxyPort=8443
+          -Dhttp.nonProxyHosts='*.sunlifecorp.com|*.ca.sunlife|*.local'
+
+
+version: '2'
+services:
+  api:
+    image: local/innersource-api
+    environment:
       - JVM_ARGS=-Xms512m
       - JVM_ARGS=-Xmx700m
       - JVM_ARGS=-Dhttp.proxyHost=proxy-mwg-http.ca.sunlife
