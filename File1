@@ -1,3 +1,23 @@
+version: '2'
+services:
+  light-proxy:
+   image: prod-dtr-ca.sunlifecorp.com/eadpapiops/light-proxy:2.7.1
+   ports:
+     - "9080:9080"
+   volumes:
+     - /tmp/innersource/config:/home/default/config
+   command: /bin/bash -c "java -Dlight-4j-config-dir=/tmp/config -Dlogback.configurationFile=/tmp/config/logback.xml -jar server.jar"
+   extra_hosts:
+     - "host.docker.internal:host-gateway"
+  api:
+   image: local/innersource-api
+   environment:
+     - JVM_ARGS="-Xms512m -Xmx700m -Dhttp.proxyHost=proxy-mwg-http.ca.sunlife -Dhttp.proxyPort=8080 -Dhttps.proxyHost=proxy-mwg-http.ca.sunlife -Dhttps.proxyPort=8443 -Dhttp.nonProxyHosts='*.sunlifecorp.com|*.ca.sunlife|*.local'"
+  ui:
+   image: prod-dtr-ca.sunlifecorp.com/innersource/innersource-portal-ui@sha256:0ce5c8e4e0019412da4d664c1b66a9ede4bd462bd5231de025ad17afeb438afb
+
+
+
 docker-api-1          | Error: Could not find or load main class "-Xms512m
 docker-api-1          | Caused by: java.lang.ClassNotFoundException: "-Xms512m
 docker-api-1 exited with code 1
