@@ -1,3 +1,18 @@
+version: '2'
+services:
+  api:
+    image: local/innersource-api
+    environment:
+      - JVM_ARGS=-Xms512m
+      - JVM_ARGS=-Xmx700m
+      - JVM_ARGS=-Dhttp.proxyHost=proxy-mwg-http.ca.sunlife
+      - JVM_ARGS=-Dhttp.proxyPort=8080
+      - JVM_ARGS=-Dhttps.proxyHost=proxy-mwg-http.ca.sunlife
+      - JVM_ARGS=-Dhttps.proxyPort=8443
+      - JVM_ARGS=-Dhttp.nonProxyHosts='*.sunlifecorp.com|*.ca.sunlife|*.local'
+
+
+
 containers:
         - name: innersource-portal-api
           image: prod-dtr-ca.sunlifecorp.com/innersource/innersource-portal-api
