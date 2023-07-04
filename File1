@@ -1,3 +1,23 @@
+version: '3'
+services:
+  light-proxy:
+    image: prod-dtr-ca.sunlifecorp.com/eadpapiops/light-proxy:2.7.1
+    ports:
+      - '9080:9080'
+    volumes:
+      - /tmp/config:/home/default/config
+      - ./config:/config
+    environment:
+      - LIGHT_4J_CONFIG_DIR=/config
+      - LOGBACK_CONFIGURATION_FILE=/config/logback.xml
+    command: /bin/bash -c "java -Dlight-4j-config-dir=/config -Dlogback.configurationFile=/config/logback.xml -jar server.jar"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+
+
+
 docker run -p 8084:8084 --add-host=host.docker.internal:host-gateway -v C:/ST/eadp-eventhub-kafkasidecar-3/config/local:/config prod-dtr-ca.sunlifecorp.com/eadpeventhubops/kafkasidecar:1.3.0
 
 
