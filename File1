@@ -1,3 +1,59 @@
+def getHost() {
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
+    {
+        sh '''
+          instanceID = aws ec2 describe-instances --filter "Name=tag:$name,Value=$value"  --query "Reservations[*].Instances[*].[InstanceId]" --output text
+        '''
+    }
+}
+
+
+
+def getPrivatekey() {
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
+    {
+
+        sh '''
+        cd /home/jenkins/agent/workspace/*master
+        mkdir secrets
+        aws secretsmanager get-secret-value --secret-id poc/mongodb --query "SecretString" --region ca-central-1 --output text > slfuser
+        sed 's/{"slfuser":"//g' slfuser > slfuser.txt
+        sed 's/"}//g' slfuser.txt > secrets/slfuser
+        '''      
+    }
+}
+
+def containersProcessing() {
+    ssh -i secrets/slfuser slfuser@hostname
+    if (removeAll == true)
+        {
+            docker stop -f $(docker ps -a -q) 
+            docker rm -f $(docker ps -a -q)
+        }
+    docker run -p $portsParam imageName
+}
+
+
+pipeline {
+    agent { label "terraform-1.1.5" }
+
+    stages {
+            stage('Container Processing') {
+                steps {
+                    getHost()
+                    getPrivatekey()
+                    containersProcessing()
+
+                }
+            }
+
+    }
+}
+
+
+
+
+
 Results-oriented professional with 8+ years of experience in automation framework development, team management, and defining strategies for improved ROI.
 Proven track record of delivering high-quality results by automating test tasks and enhancing software quality.
 Extensive experience in evaluating UI and API automation tools and implementing advanced DevOps concepts, utilizing Jenkins, Docker, terraform, ansible, Kubernetes, and AWS.
