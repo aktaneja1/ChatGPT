@@ -1,55 +1,48 @@
+def hostname
+def privateKey
+
 def getHost() {
-    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-    {
-        sh '''
-          instanceID = aws ec2 describe-instances --filter "Name=tag:$name,Value=$value"  --query "Reservations[*].Instances[*].[InstanceId]" --output text
-        '''
-    }
+    // ...
+    sh '''
+        hostname=$(aws ec2 describe-instances ...)
+    '''
+    // Assign the output to the global 'hostname' variable
+    hostname = sh(script: 'echo $hostname', returnStdout: true).trim()
+    echo "Host: ${hostname}" // Optional: Print the hostname
 }
 
-
-
-def getPrivatekey() {
-    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-    {
-
-        sh '''
-        cd /home/jenkins/agent/workspace/*master
-        mkdir secrets
-        aws secretsmanager get-secret-value --secret-id poc/mongodb --query "SecretString" --region ca-central-1 --output text > slfuser
-        sed 's/{"slfuser":"//g' slfuser > slfuser.txt
-        sed 's/"}//g' slfuser.txt > secrets/slfuser
-        '''      
-    }
+def getPrivateKey() {
+    // ...
 }
 
 def containersProcessing() {
-    ssh -i secrets/slfuser slfuser@hostname
-    if (removeAll == true)
-        {
-            docker stop -f $(docker ps -a -q) 
-            docker rm -f $(docker ps -a -q)
-        }
-    docker run -p $portsParam imageName
+    // Use the global 'hostname' variable here
+    sshagent(['secrets/slfuser']) {
+        ssh user: 'slfuser', host: hostname, command: 'docker stop -f $(docker ps -a -q); docker rm -f $(docker ps -a -q)'
+        ssh user: 'slfuser', host: hostname, command: "docker run -p ${params.portsParam} ${params.imageName}"
+    }
 }
-
 
 pipeline {
     agent { label "terraform-1.1.5" }
 
+    parameters {
+        string(name: 'name', description: 'Name as String')
+        string(name: 'value', description: 'Value as String')
+        booleanParam(name: 'removeAll', defaultValue: false, description: 'Remove all containers')
+        string(name: 'imageName', description: 'Image name as String')
+    }
+
     stages {
-            stage('Container Processing') {
-                steps {
-                    getHost()
-                    getPrivatekey()
-                    containersProcessing()
-
-                }
+        stage('Container Processing') {
+            steps {
+                getHost()
+                getPrivateKey()
+                containersProcessing()
             }
-
+        }
     }
 }
-
 
 
 
