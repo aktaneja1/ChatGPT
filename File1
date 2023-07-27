@@ -1,51 +1,89 @@
-def hostname
-def privateKey
+def instanceID // for storing Instance id filtered using tag name
 
 def getHost() {
-    // ...
-    sh '''
-        hostname=$(aws ec2 describe-instances ...)
-    '''
-    // Assign the output to the global 'hostname' variable
-    hostname = sh(script: 'echo $hostname', returnStdout: true).trim()
-    echo "Host: ${hostname}" // Optional: Print the hostname
-}
-
-def getPrivateKey() {
-    // ...
-}
-
-def containersProcessing() {
-    // Use the global 'hostname' variable here
-    sshagent(['secrets/slfuser']) {
-        ssh user: 'slfuser', host: hostname, command: 'docker stop -f $(docker ps -a -q); docker rm -f $(docker ps -a -q)'
-        ssh user: 'slfuser', host: hostname, command: "docker run -p ${params.portsParam} ${params.imageName}"
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
+    {
+        //def localName = params.name
+        //def localValue = params.value
+        sh '''
+          instanceID = $(aws ec2 describe-instances --region "ca-central-1" --filter "Name=tag:$name,Values=$value"  --query "Reservations[*].Instances[*].PrivateIpAddress" --output text)
+          export instanceID = $instanceID
+        '''
+        // echo "Host: ${env.instanceID}" // Printing the hostname
     }
 }
 
+
+// Method to fetch and create Private Key
+def getPrivatekey() {
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'slf-func-ec2-aep_user', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
+    {
+
+        sh '''
+        pwd
+        cd /home/jenkins/agent/workspace/*feature
+        mkdir secrets
+        aws secretsmanager get-secret-value --secret-id poc/mongodb --query "SecretString" --region ca-central-1 --output text > slfuser
+        sed 's/{"slfuser":"//g' slfuser > slfuser.txt
+        sed 's/"}//g' slfuser.txt > secrets/slfuser
+        '''      
+    }
+}
+
+def containersProcessing() {
+
+    // def localPort = params.portNumber
+    // def localimageName = params.imageName
+    // def removeFlag = params.removeAll
+    sh '''
+    ls -lrt
+    if ($removeAll == true)
+        {
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@$instanceID "docker stop -f $(docker ps -a -q)"
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@$instanceID "docker rm -f $(docker ps -a -q)"            
+            
+        }
+    ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@$instanceID "docker run -p $portNumber:$portNumber $imageName"
+    '''
+}
+
+
 pipeline {
     agent { label "terraform-1.1.5" }
-
-    parameters {
+     parameters {
         string(name: 'name', description: 'Name as String')
         string(name: 'value', description: 'Value as String')
         booleanParam(name: 'removeAll', defaultValue: false, description: 'Remove all containers')
         string(name: 'imageName', description: 'Image name as String')
+        string(name: 'portNumber', description: 'port number as String')
     }
 
     stages {
-        stage('Container Processing') {
-            steps {
-                getHost()
-                getPrivateKey()
-                containersProcessing()
+            stage('Container Processing') {
+                steps {
+                    script {
+                        env.name = params.name
+                        env.value = params.value
+                        env.removeAll = params.removeAll
+                        env.imageName = params.imageName
+                        env.portNumber = params.portNumber
+
+                    }
+                    getHost()
+                    getPrivatekey()
+                    containersProcessing()
+
+                }
             }
-        }
+
     }
 }
 
 
-
+[Pipeline] sh
++ aws ec2 describe-instances --region ca-central-1 --filter Name=tag:Name,Values=innersource-demo --query Reservations[*].Instances[*].PrivateIpAddress --output text
++ instanceID = 10.231.97.147
+/home/jenkins/agent/workspace/secontainer_feature_runContainer@tmp/durable-132d34d4/script.sh: 2: instanceID: not found
 
 Results-oriented professional with 8+ years of experience in automation framework development, team management, and defining strategies for improved ROI.
 Proven track record of delivering high-quality results by automating test tasks and enhancing software quality.
