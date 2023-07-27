@@ -1,3 +1,39 @@
+def containersProcessing() {
+
+    sh """
+    privateKeyPath=\"/home/jenkins/agent/workspace/*feature*\"
+    ls -lrt
+    if [ \"\$removeAll\" -eq true ]
+    then
+        {
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i \$privateKeyPath/slfuser.pem slfuser@\${instanceID} \"docker stop -f \$(docker ps -a -q)\"
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i \$privateKeyPath/slfuser.pem slfuser@\${instanceID} \"docker rm -f \$(docker ps -a -q)\"            
+            
+        }
+    fi
+    ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i \$privateKeyPath/slfuser.pem slfuser@\${instanceID} \"docker run -p \$portNumber:\$portNumber \$imageName\"
+    """
+}
+
++ privateKeyPath=/home/jenkins/agent/workspace/*feature*
++ ls -lrt
+total 16
+-rw-r--r--. 1 jenkins users 3148 Jul 27 09:17 Jenkinsfile
+-rw-r--r--. 1 jenkins users  112 Jul 27 09:17 pipeline_config.groovy
+-rw-r--r--. 1 jenkins users 1693 Jul 27 09:17 slfuser
+-rw-r--r--. 1 jenkins users 1681 Jul 27 09:17 slfuser.txt
+drwxr-xr-x. 2 jenkins users   21 Jul 27 09:17 secrets
++ [ false -eq true ]
+/home/jenkins/agent/workspace/secontainer_feature_runContainer@tmp/durable-a355c26b/script.sh: 4: [: Illegal number: false
++ ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i /home/jenkins/agent/workspace/*feature*/slfuser.pem slfuser@ docker run -p 9080:9080 prod-dtr-ca.sunlifecorp.com/dsaep/template-creator-api:22
+Warning: Identity file /home/jenkins/agent/workspace/*feature*/slfuser.pem not accessible: No such file or directory.
+ssh: Could not resolve hostname : Name or service not known
+
+
+
+
+
+
 def instanceID // for storing Instance id filtered using tag name
 
 def getHost() {
