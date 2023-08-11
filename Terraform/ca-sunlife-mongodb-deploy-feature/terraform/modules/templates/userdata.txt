@@ -1,0 +1,8 @@
+#!/bin/bash
+#echo 'echo "${hostname}.sunlifecorp.com" > /etc/hostname' >> /tmp/host.sh
+hostnamectl set-hostname ${hostname}.sunlifecorp.com
+echo 'echo "${pri} mongodb-1 mongodb-1.sunlifecorp.com" >> /etc/hosts' >> /tmp/host.sh
+echo 'echo "${sec1} mongodb-2  mongodb-2.sunlifecorp.com" >> /etc/hosts' >> /tmp/host.sh
+echo 'echo "${sec2} mongodb-3  mongodb-3.sunlifecorp.com" >> /etc/hosts' >> /tmp/host.sh
+sudo chmod +x /tmp/host.sh
+sudo sh /tmp/host.sh

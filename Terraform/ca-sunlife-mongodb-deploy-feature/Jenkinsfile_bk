@@ -1,0 +1,159 @@
+#!/usr/bin/env groovy
+def terraform_cmd
+def dry_run = ['yes', 'no']
+def restore = ['no', 'yes']
+
+
+
+// Active Choice Paramters - Define variables
+List terraform_list = ["\"Select:selected\"","\"plan\"","\"apply\"","\"destroy\""]
+List apply_list = ["\"Select:selected\"","\"new db servers\"","\"restore from snapshot\""]
+List destroy_list = ["\"Select:selected\"","\"no backup\"","\"create data vol snapshot\""]
+List confirm_list = ["\"Select:selected\"","\"no\"","\"yes\""]
+List default_item = ["\"Not Applicable\""]
+
+String terraform = buildScript(terraform_list)
+String apply = buildScript(apply_list)
+String destroy = buildScript(destroy_list)
+String confirm = buildScript(confirm_list)
+String items = populateItems(default_item,apply_list,destroy_list)
+String items1 = populateItems1(default_item,confirm_list)
+
+// Methods to build groovy scripts to populate data
+String buildScript(List values){
+  return "return $values"
+}
+String populateItems(List default_item, List applyList, List destroyList){
+return """if(terraform.equals('apply')){return $applyList}
+     else if(terraform.equals('destroy')){return $destroyList}
+     else{return $default_item}
+     """
+}
+String populateItems1(List default_item, List confirmList){
+return """if(terraform.equals('apply') || terraform.equals('destroy')){return $confirmList}
+     else{return $default_item}
+     """
+}
+
+// Properties step to set the Active choice parameters via Declarative Scripting
+properties([
+    parameters([
+        [$class: 'ChoiceParameter', 
+            choiceType: 'PT_SINGLE_SELECT',   
+            name: 'terraform', 
+            script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: true, script: 'return ["ERROR"]'], 
+            script: [classpath: [], sandbox: true, script:  terraform]]],
+        [$class: 'CascadeChoiceParameter', 
+            choiceType: 'PT_SINGLE_SELECT',
+            name: 'action', 
+            referencedParameters: 'terraform', 
+            script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: true, script: 'return ["error"]'], 
+            script: [classpath: [], sandbox: true, script: items]]],
+        [$class: 'CascadeChoiceParameter', 
+            choiceType: 'PT_SINGLE_SELECT',
+            name: 'confirm', 
+            referencedParameters: 'terraform', 
+            script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: true, script: 'return ["error"]'], 
+            script: [classpath: [], sandbox: true, script: items1]]]
+    ])
+])
+ //Active Choice Parameter//
+
+pipeline {
+    parameters {
+        choice(name: 'dryrun', choices: dry_run, description: 'performing terraform plan only when it selected to yes')
+        choice(name: 'restore_from_snapshot', choices: restore, description: 'restore data volume from snapshot when it selected to yes')
+        string(name: 'destroy', defaultValue: 'no', description: 'yes to destroy' )
+        string(name: 'backup_before_destroy', defaultValue: 'no', description: 'Creating data volume snapshot from Primary MongoDB server before TERRAFORM DESTROY')
+    }
+
+    agent { label "terraform-1.1.5" }
+
+    options {
+        timestamps()
+    }
+    stages{
+
+        stage('Initialize') {
+            steps {
+                scm_checkout()
+                script {
+                    terraform_cmd = load "terraform.groovy"
+                    terraform_cmd.init("slf-func-ec2-aep_user")
+                }
+            }
+        }
+
+        stage('Initialize .tfvars'){
+            steps {
+                script {
+                    terraform_cmd.initialize("slf-func-ec2-aep_user")
+                }
+            }
+        }
+        
+        stage('terraform plan'){
+            steps {
+                script {
+                    terraform_cmd.plan("slf-func-ec2-aep_user")
+                }
+            }
+        }
+
+        stage('terraform apply'){
+            when {
+                expression {
+                    return params.dryrun == 'no' && params.destroy == 'no'
+                }
+            }
+            steps {
+                script {
+                    terraform_cmd.apply("slf-func-ec2-aep_user")
+                }
+            }
+        }
+
+        stage('restore data from snapshot'){
+            when {
+                expression {
+                    return params.dryrun == 'no' && params.restore_from_snapshot == 'yes' && params.destroy == 'no' 
+                }
+            }
+            steps {
+                script {
+                    restore = load "restore_from_snapshot.groovy"
+                    restore.restore_from_snapshot("slf-func-ec2-aep_user")
+                }
+            }
+        }		
+
+        stage('create data snapshot'){
+            when {
+                expression {
+                    return params.dryrun == 'no' && params.destroy == 'yes' && params.restore_from_snapshot == 'no' && params.backup_before_destroy == 'yes'
+                }
+            }
+            steps {
+                script {
+                    restore = load "restore_from_snapshot.groovy"
+                    restore.backup("slf-func-ec2-aep_user")
+                }
+            }
+        }
+
+        stage('terraform destroy'){
+            when {
+                expression {
+                    return params.dryrun == 'no' && params.destroy == 'yes' && params.restore_from_snapshot == 'no'
+                }
+            }
+            steps {
+                script {
+                    terraform_cmd.destroy("slf-func-ec2-aep_user")
+                }
+            }
+        }	
+
+    }
+
+}
