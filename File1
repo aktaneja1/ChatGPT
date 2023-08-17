@@ -1,3 +1,25 @@
+    sh """
+    privateKeyPath=\"/home/jenkins/agent/workspace/*feature*/secrets\"
+    ls -lrt
+    cd secrets
+    ls -lrt
+    if ( \"\$removeAll\" == \"true\" )
+    then
+        {
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@\${INSTANCE_ID} \"sudo podman stop -f $(docker ps -a -q)\"
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@\${INSTANCE_ID} \"sudo podman rm -f $(docker ps -a -q)\"            
+            
+        }
+    fi
+    """
+
++ ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@10.231.97.26 sudo podman stop -f 
+Error: flag needs an argument: 'f' in -f
+
+
+
+
+
 def containersProcessing() {
 
     sh """
