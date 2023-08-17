@@ -1,4 +1,20 @@
-    sh """
++ true == true
++ sudo podman ps -a -q
+/home/jenkins/agent/workspace/secontainer_feature_runContainer@tmp/durable-63f2302c/script.sh: 9: sudo: not found
++ ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@10.231.97.26 sudo podman stop 
+Access to this system is provided by Sun Life Financial solely for
+authorized business use and may be monitored for technical or
+regulatory reasons.  If you do not consent to this monitoring, do not
+use this system.
+
+L'accès au système est fourni par la Financière Sun Life à des fins
+d'activitès autorisèes uniquement et il peut faire l'objet d'une
+surveillance pour des raisons techniques et pour les besoins de la rè
+glementation. Si vous ne consentez pas à cette surveillance, veuillez
+vous abstenir d'utiliser le système.
+Error: you must provide at least one name or id
+
+ sh """
     privateKeyPath=\"/home/jenkins/agent/workspace/*feature*/secrets\"
     ls -lrt
     cd secrets
@@ -6,18 +22,12 @@
     if ( \"\$removeAll\" == \"true\" )
     then
         {
-            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@\${INSTANCE_ID} \"sudo podman stop -f $(docker ps -a -q)\"
-            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@\${INSTANCE_ID} \"sudo podman rm -f $(docker ps -a -q)\"            
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@\${INSTANCE_ID} \"sudo podman stop \$(sudo podman ps -a -q)\"
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@\${INSTANCE_ID} \"sudo podman rm \$(sudo podman ps -a -q)\"            
             
         }
     fi
     """
-
-+ ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i slfuser.pem slfuser@10.231.97.26 sudo podman stop -f 
-Error: flag needs an argument: 'f' in -f
-
-
-
 
 
 def containersProcessing() {
@@ -28,8 +38,8 @@ def containersProcessing() {
     if [ \"\$removeAll\" -eq true ]
     then
         {
-            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i \$privateKeyPath/slfuser.pem slfuser@\${instanceID} \"docker stop -f \$(docker ps -a -q)\"
-            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i \$privateKeyPath/slfuser.pem slfuser@\${instanceID} \"docker rm -f \$(docker ps -a -q)\"            
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i \$privateKeyPath/slfuser.pem slfuser@\${instanceID} \"docker stop -f \$(sudo podman ps -a -q)\"
+            ssh -o StrictHostKeyChecking=no -o BatchMode=yes -i \$privateKeyPath/slfuser.pem slfuser@\${instanceID} \"docker rm -f \$(sudo podman ps -a -q)\"            
             
         }
     fi
