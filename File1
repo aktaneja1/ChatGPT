@@ -1,3 +1,8 @@
+/home/jenkins/agent/workspace/form-podmanbasecontainer_develop@tmp/durable-ed4ab6a4/script.sh: 11: Syntax error: word unexpected (expecting ")")
+
+echo "\$(emailNotification('\$app_ec2_private_ip'))"
+
+
 def ec2_host_name
 
 def emailNotification(String ipAddr)
