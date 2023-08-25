@@ -1,3 +1,73 @@
+def ec2_host_name
+
+def emailNotification(String ipAddr)
+ {
+    //to = "akshey.taneja@sunlife.com"
+    emailext (
+              to: params.Mailing_List,
+            from: 'Jenkins',
+         subject: 'IP address of ec2 instance:'+ipAddr,
+            body: 'ip_address: '+ipAddr+'\n'+
+                  "Jenkins Build: \'${currentBuild.absoluteUrl}\'\n" +
+                  "\n\n Regards,\n AEP Team"
+    )
+ }
+
+pipeline {
+    agent { label "terraform-1.1.5" }
+    parameters {
+        string(name: 'TF_VAR_owner', description: 'owner of the repo like ddm')
+        string(name: 'TF_VAR_repo', description: 'name of the repo')
+        string(name: 'TF_VAR_branch', description: 'branch to be used for cloning')
+        string(name: 'TF_VAR_scriptPath', description: 'path where executable script is located')
+        string(name: 'Mailing_List', description: 'email to be sent to')
+
+    }    
+    environment {
+            TF_IN_AUTOMATION = 'true'
+            AWS_ACCESS_KEY_ID     = credentials('slf-workload-account-ec2-aws_access_key_id')
+            AWS_SECRET_ACCESS_KEY = credentials('slf-workload-account-ec2-aws_secret_access_key')
+           // AWS_SESSION_TOKEN = credentials('slf-workload-account-ec2-session_token_ID')           
+			//tf_log = 'TRACE'
+//            TF_CLI_CONFIG_FILE = credentials('terraform-cloud-slf-prod')
+    }
+
+    stages {
+        stage('cd') {
+            steps {
+                     withCredentials([usernamePassword(credentialsId: 'gitget-userid-password',usernameVariable: 'TF_VAR_bitbucketUsername',passwordVariable: 'TF_VAR_bitbucketPassword')]){
+                        script {
+                        env.TF_VAR_owner = params.TF_VAR_owner
+                        env.TF_VAR_branch = params.TF_VAR_branch
+                        env.TF_VAR_repo = params.TF_VAR_repo
+                        env.TF_VAR_scriptPath = params.TF_VAR_scriptPath
+                       }
+                         echo 'Deploying Infrastructure using Terraform'
+                        sh """
+                            ls -lrt
+                            cd ./terraform   
+                            curl -o tf.zip https://releases.hashicorp.com/terraform/1.5.2/terraform_1.5.2_linux_amd64.zip ; yes | unzip tf.zip                  
+                            ./terraform -version
+                            ./terraform init -input=false
+                            ./terraform plan
+                            ./terraform apply -input=false -auto-approve
+                            export \$(./terraform output | sed 's/\\s*=\\s*/=/g' | xargs)
+                            echo \$app_ec2_private_ip
+                            echo \$(emailNotification(\$app_ec2_private_ip))
+                         """				
+                     }
+                }				
+            }
+        }
+
+    }
+
+
+
+/home/jenkins/agent/workspace/form-podmanbasecontainer_develop@tmp/durable-b874e0e9/script.sh: 11: Syntax error: word unexpected (expecting ")")
+
+
+
 + true == true
 + sudo podman ps -a -q
 /home/jenkins/agent/workspace/secontainer_feature_runContainer@tmp/durable-63f2302c/script.sh: 9: sudo: not found
