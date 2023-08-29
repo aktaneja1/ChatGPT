@@ -1,3 +1,16 @@
+volumeFileName="Akshey"
+if ( ${#volumeFileName} != 0 )
+then
+ {
+  echo "Pass"
+ }
+else
+ {
+  echo "Fail"
+ }
+fi
+
+
 java.lang.NullPointerException: Cannot invoke method create() on null object
 	at org.codehaus.groovy.runtime.NullObject.invokeMethod(NullObject.java:91)
 	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:47)
