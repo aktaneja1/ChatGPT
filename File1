@@ -1,3 +1,53 @@
+// ansibleTowerLibrary.groovy
+
+def call(Map config) {
+    node {
+        stage("Run Ansible Tower Template") {
+            steps {
+                script {
+                    def towerServer = config.towerServer
+                    def towerCredentialsId = config.towerCredentialsId
+                    def templateType = config.templateType
+                    def jobTemplate = config.jobTemplate
+                    def towerLogLevel = config.towerLogLevel
+                    def inventory = config.inventory
+                    def jobTags = config.jobTags
+                    def skipJobTags = config.skipJobTags
+                    def limit = config.limit
+                    def removeColor = config.removeColor
+                    def verbose = config.verbose
+                    def credential = config.credential
+                    def extraVars = config.extraVars
+                    def async = config.async
+
+                    // Call Ansible Tower with the provided parameters
+                    ansibleTower(
+                        towerServer: towerServer,
+                        towerCredentialsId: towerCredentialsId,
+                        templateType: templateType,
+                        jobTemplate: jobTemplate,
+                        towerLogLevel: towerLogLevel,
+                        inventory: inventory,
+                        jobTags: jobTags,
+                        skipJobTags: skipJobTags,
+                        limit: limit,
+                        removeColor: removeColor,
+                        verbose: verbose,
+                        credential: credential,
+                        extraVars: extraVars,
+                        async: async
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
 jte {
     pipeline_template = "sunlife-vendor-applications-cd-template"
 }
