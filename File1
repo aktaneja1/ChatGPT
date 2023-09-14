@@ -1,3 +1,89 @@
+jte {
+    pipeline_template = "sunlife-vendor-applications-cd-template"
+}
+libraries{
+    pod_template {
+        use_existing_agent {
+            agent_label = "iac-build-agent"
+        }
+    }
+    git
+    tflint
+    sonarqube
+    terraform {
+        deploy {
+            credentialsId = "terraform-cloud-slf-prod"
+            //tf_log = "OFF"
+            terraformVersion = "1.3.4"
+        }
+    } 
+}
+
+application_environments{
+    dev{
+        long_name = "Development"
+        tfcb_workspace_name = "enterprise_aep-dev"
+    }
+//    sit{
+//        long_name = "SIT"
+//        tfcb_workspace_name = "jte-packer-terraform-demo-sit"
+//    }
+//    stg{                      // Do not call this 'stage', it will be interpreted as a pipeline stage
+//        long_name = "Stage"
+//        tfcb_workspace_name = "jte-packer-terraform-demo-stage"
+//    }
+//    prod{
+//        long_name = "Production"
+//       tfcb_workspace_name = "jte-packer-terraform-demo-prod"
+//    }
+}
+
+
+parameters {
+    choice(
+        name: 'Env',
+        choices: ['dev', 'sit', 'stage', 'prod'],
+        description: 'Select the environment where you wish to deploy to'
+    )
+}
+use_existing_agent {
+    scm_checkout()
+    linting()
+    static_code_analysis()
+    script {
+        switch(params.Env){
+            case "dev":
+                pre_deploy dev
+                deploy dev
+                post_deploy dev
+                break;
+            case "sit":
+                pre_deploy sit
+                deploy sit
+                post_deploy sit
+                break;
+            case "stage":
+                pre_deploy stg
+                deploy stg
+                post_deploy stg
+                break;
+            case "prod":
+                pre_deploy prod
+                deploy prod
+                post_deploy prod
+                break;
+            default:
+                echo "Not a valid environment"
+        }
+    }
+    track_pipeline_usage()
+}
+
+
+
+
+
+
 Hello Nick,
 
 Thank you for releasing the offer for DevOps role in Sunlife US. I am really very grateful to you and team. 
