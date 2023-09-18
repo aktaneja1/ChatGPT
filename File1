@@ -1,3 +1,88 @@
+[Pipeline] // stage
+[JTE][Step - ansible/runningAnsiblePlaybook.call(LinkedHashMap)]
+[Pipeline] stage
+[Pipeline] { (Running Ansible Playbook)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+Terminated
+[Pipeline] // node
+[Pipeline] End of Pipeline
+hudson.remoting.ProxyException: groovy.lang.MissingMethodException: No signature of method: org.jenkinsci.plugins.workflow.cps.DSL.call() is applicable for argument types: (org.jenkinsci.plugins.workflow.cps.CpsClosure2) values: [org.jenkinsci.plugins.workflow.cps.CpsClosure2@157ede8b]
+Possible solutions: wait(), any(), wait(long), any(groovy.lang.Closure), each(groovy.lang.Closure), grep()
+	at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.unwrap(ScriptBytecodeAdapter.java:71)
+	at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.unwrap(ScriptBytecodeAdapter.java:77)
+	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:53)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:116)
+	at com.cloudbees.groovy.cps.sandbox.DefaultInvoker.methodCall(DefaultInvoker.java:20)
+	at ansible.steps.JTE_ansible_runningAnsiblePlaybook.call(JTE_ansible_runningAnsiblePlaybook:7)
+	at ___cps.transform___(Native Method)
+
+
+
+runningAnsiblePlaybook(
+					jobTemplate: 'SLC-Enterprise-Post-Deploy',
+					extraVars: '''---
+ansible_inventory_hosts: '10.231.96.129'
+'''
+	)
+
+package ansible.steps
+
+def call(Map ansible_config) {
+    String credentialsId = config.credentialsId
+        stage("Running Ansible Playbook") {
+            steps {
+                script {
+                    def towerServer = ansible_config.towerServer ?: 'Ansible Tower prod'
+                    def towerCredentialsId = "${credentialsId}" ?: 'jenkinsansdmssqlpr'
+                    def templateType = ansible_config.templateType ?: 'job'
+                    def jobTemplate = ansible_config.jobTemplate
+                    def towerLogLevel = ansible_config.towerLogLevel ?: 'full'
+                    def inventory = ansible_config.inventory ?: ''
+                    def jobTags = ansible_config.jobTags ?: ''
+                    def skipJobTags = ansible_config.skipJobTags ?: ''
+                    def limit = ansible_config.limit ?: ''
+                    def removeColor = ansible_config.removeColor ?: false
+                    def verbose = ansible_config.verbose ?: true
+                    def credential = ansible_config.credential ?: ''
+                    def extraVars = ansible_config.extraVars ?: ''
+                    def async = ansible_config.async ?: false
+
+                    // Call Ansible Tower with the provided parameters
+                    output = ansibleTower(
+                        towerServer: towerServer,
+                        towerCredentialsId: towerCredentialsId,
+                        templateType: templateType,
+                        jobTemplate: jobTemplate,
+                        towerLogLevel: towerLogLevel,
+                        inventory: inventory,
+                        jobTags: jobTags,
+                        skipJobTags: skipJobTags,
+                        limit: limit,
+                        removeColor: removeColor,
+                        verbose: verbose,
+                        credential: credential,
+                        extraVars: extraVars,
+                        async: async
+                    )
+                    if( output['JOB RESULT'] == 'FAILED' ){
+                        error("Ansible Playbook ${jobTemplate} failed" )
+                    }
+                }
+            }
+        }
+}
+
+
+
 // ansibleTowerLibrary.groovy
 
 def call(Map config) {
