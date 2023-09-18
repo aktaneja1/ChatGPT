@@ -1,21 +1,5 @@
-[Pipeline] // stage
-[JTE][Step - ansible/runningAnsiblePlaybook.call(LinkedHashMap)]
-[Pipeline] stage
-[Pipeline] { (Running Ansible Playbook)
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // stage
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-[Pipeline] // withEnv
-[Pipeline] }
-Terminated
-[Pipeline] // node
-[Pipeline] End of Pipeline
-hudson.remoting.ProxyException: groovy.lang.MissingMethodException: No signature of method: org.jenkinsci.plugins.workflow.cps.DSL.call() is applicable for argument types: (org.jenkinsci.plugins.workflow.cps.CpsClosure2) values: [org.jenkinsci.plugins.workflow.cps.CpsClosure2@157ede8b]
-Possible solutions: wait(), any(), wait(long), any(groovy.lang.Closure), each(groovy.lang.Closure), grep()
+hudson.remoting.ProxyException: groovy.lang.MissingMethodException: No signature of method: org.jenkinsci.plugins.workflow.cps.DSL.call() is applicable for argument types: (org.jenkinsci.plugins.workflow.cps.CpsClosure2) values: [org.jenkinsci.plugins.workflow.cps.CpsClosure2@70f78a15]
+Possible solutions: wait(), any(), wait(long), each(groovy.lang.Closure), any(groovy.lang.Closure), dump()
 	at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.unwrap(ScriptBytecodeAdapter.java:71)
 	at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.unwrap(ScriptBytecodeAdapter.java:77)
 	at org.codehaus.groovy.runtime.callsite.PogoMetaClassSite.call(PogoMetaClassSite.java:53)
@@ -24,37 +8,117 @@ Possible solutions: wait(), any(), wait(long), any(groovy.lang.Closure), each(gr
 	at com.cloudbees.groovy.cps.sandbox.DefaultInvoker.methodCall(DefaultInvoker.java:20)
 	at ansible.steps.JTE_ansible_runningAnsiblePlaybook.call(JTE_ansible_runningAnsiblePlaybook:7)
 	at ___cps.transform___(Native Method)
-
-
-
-runningAnsiblePlaybook(
-					jobTemplate: 'SLC-Enterprise-Post-Deploy',
-					extraVars: '''---
-ansible_inventory_hosts: '10.231.96.129'
-'''
-	)
-
+	at com.cloudbees.groovy.cps.impl.ContinuationGroup.methodCall(ContinuationGroup.java:90)
+	at com.cloudbees.groovy.cps.impl.FunctionCallBlock$ContinuationImpl.dispatchOrArg(FunctionCallBlock.java:113)
+	at com.cloudbees.groovy.cps.impl.FunctionCallBlock$ContinuationImpl.fixArg(FunctionCallBlock.java:83)
+	at jdk.internal.reflect.GeneratedMethodAccessor569.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at com.cloudbees.groovy.cps.impl.ContinuationPtr$ContinuationImpl.receive(ContinuationPtr.java:72)
+	at com.cloudbees.groovy.cps.impl.ClosureBlock.eval(ClosureBlock.java:46)
+Caused: hudson.remoting.ProxyException: org.codehaus.groovy.runtime.InvokerInvocationException: groovy.lang.MissingMethodException: No signature of method: org.jenkinsci.plugins.workflow.cps.DSL.call() is applicable for argument types: (org.jenkinsci.plugins.workflow.cps.CpsClosure2) values: [org.jenkinsci.plugins.workflow.cps.CpsClosure2@70f78a15]
+Possible solutions: wait(), any(), wait(long), each(groovy.lang.Closure), any(groovy.lang.Closure), dump()
+	at org.boozallen.plugins.jte.init.primitives.injectors.StepWrapperCPS.methodMissing(script1695032001545216937907.groovy:62)
+	at WorkflowScript.run(WorkflowScript:13)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.delegateAndExecute(ModelInterpreter.groovy:137)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.executeSingleStage(ModelInterpreter.groovy:666)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.catchRequiredContextForNode(ModelInterpreter.groovy:395)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.catchRequiredContextForNode(ModelInterpreter.groovy:393)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.executeSingleStage(ModelInterpreter.groovy:665)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:288)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.toolsBlock(ModelInterpreter.groovy:544)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.toolsBlock(ModelInterpreter.groovy:543)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:276)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.withEnvBlock(ModelInterpreter.groovy:443)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.withEnvBlock(ModelInterpreter.groovy:442)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:275)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.withCredentialsBlock(ModelInterpreter.groovy:481)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.withCredentialsBlock(ModelInterpreter.groovy:480)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:274)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.inDeclarativeAgent(ModelInterpreter.groovy:586)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.inDeclarativeAgent(ModelInterpreter.groovy:585)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:272)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.stageInput(ModelInterpreter.groovy:356)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.stageInput(ModelInterpreter.groovy:355)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:261)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.inWrappers(ModelInterpreter.groovy:618)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.inWrappers(ModelInterpreter.groovy:617)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:259)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.withEnvBlock(ModelInterpreter.groovy:443)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.withEnvBlock(ModelInterpreter.groovy:442)
+	at org.jenkinsci.plugins.pipeline.modeldefinition.ModelInterpreter.evaluateStage(ModelInterpreter.groovy:254)
+	at ___cps.transform___(Native Method)
+	at jdk.internal.reflect.GeneratedConstructorAccessor766.newInstance(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:490)
+	at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:83)
+	at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrapNoCoerce.callConstructor(ConstructorSite.java:105)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:59)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:238)
+	at com.cloudbees.groovy.cps.sandbox.DefaultInvoker.constructorCall(DefaultInvoker.java:25)
+	at com.cloudbees.groovy.cps.impl.FunctionCallBlock$ContinuationImpl.dispatchOrArg(FunctionCallBlock.java:97)
+	at com.cloudbees.groovy.cps.impl.FunctionCallBlock$ContinuationImpl.fixArg(FunctionCallBlock.java:83)
+	at jdk.internal.reflect.GeneratedMethodAccessor569.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at com.cloudbees.groovy.cps.impl.ContinuationPtr$ContinuationImpl.receive(ContinuationPtr.java:72)
+	at com.cloudbees.groovy.cps.impl.LocalVariableBlock$LocalVariable.get(LocalVariableBlock.java:38)
+	at com.cloudbees.groovy.cps.LValueBlock$GetAdapter.receive(LValueBlock.java:30)
+	at com.cloudbees.groovy.cps.impl.LocalVariableBlock.evalLValue(LocalVariableBlock.java:27)
+	at com.cloudbees.groovy.cps.LValueBlock$BlockImpl.eval(LValueBlock.java:55)
+	at com.cloudbees.groovy.cps.LValueBlock.eval(LValueBlock.java:16)
+	at com.cloudbees.groovy.cps.Next.step(Next.java:83)
+	at com.cloudbees.groovy.cps.Continuable$1.call(Continuable.java:177)
+	at com.cloudbees.groovy.cps.Continuable$1.call(Continuable.java:166)
+	at org.codehaus.groovy.runtime.GroovyCategorySupport$ThreadCategoryInfo.use(GroovyCategorySupport.java:136)
+	at org.codehaus.groovy.runtime.GroovyCategorySupport.use(GroovyCategorySupport.java:275)
+	at com.cloudbees.groovy.cps.Continuable.run0(Continuable.java:166)
+	at org.jenkinsci.plugins.workflow.cps.SandboxContinuable.access$001(SandboxContinuable.java:18)
+	at org.jenkinsci.plugins.workflow.cps.SandboxContinuable.run0(SandboxContinuable.java:51)
+	at org.jenkinsci.plugins.workflow.cps.CpsThread.runNextChunk(CpsThread.java:187)
+	at org.jenkinsci.plugins.workflow.cps.CpsThreadGroup.run(CpsThreadGroup.java:420)
+	at org.jenkinsci.plugins.workflow.cps.CpsThreadGroup.access$400(CpsThreadGroup.java:95)
+	at org.jenkinsci.plugins.workflow.cps.CpsThreadGroup$2.call(CpsThreadGroup.java:330)
+	at org.jenkinsci.plugins.workflow.cps.CpsThreadGroup$2.call(CpsThreadGroup.java:294)
+	at org.jenkinsci.plugins.workflow.cps.CpsVmExecutorService$2.call(CpsVmExecutorService.java:67)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at hudson.remoting.SingleLaneExecutorService$1.run(SingleLaneExecutorService.java:139)
+	at jenkins.util.ContextResettingExecutorService$1.run(ContextResettingExecutorService.java:28)
+	at jenkins.security.ImpersonatingExecutorService$1.run(ImpersonatingExecutorService.java:68)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+[Bitbucket] Notifying commit build result
+[Bitbucket] Build result notified
+[InfluxDB Plugin] Collecting data...
+[InfluxDB Plugin] Git data found. Writing to InfluxDB...
+[InfluxDB plugin] Metrics plugin data found. Writing to InfluxDB...
+[InfluxDB Plugin] Publishing data to target 'InfluxDB Prod' (url='https://influxdb.sunlifecorp.com/metrics/', database='grafana_jenkins')
+[InfluxDB Plugin] Completed.
+Finished: FAILURE
 package ansible.steps
 
-def call(Map ansible_config) {
+void call(app_config = [:]) {
     String credentialsId = config.credentialsId
         stage("Running Ansible Playbook") {
             steps {
                 script {
-                    def towerServer = ansible_config.towerServer ?: 'Ansible Tower prod'
-                    def towerCredentialsId = "${credentialsId}" ?: 'jenkinsansdmssqlpr'
-                    def templateType = ansible_config.templateType ?: 'job'
-                    def jobTemplate = ansible_config.jobTemplate
-                    def towerLogLevel = ansible_config.towerLogLevel ?: 'full'
-                    def inventory = ansible_config.inventory ?: ''
-                    def jobTags = ansible_config.jobTags ?: ''
-                    def skipJobTags = ansible_config.skipJobTags ?: ''
-                    def limit = ansible_config.limit ?: ''
-                    def removeColor = ansible_config.removeColor ?: false
-                    def verbose = ansible_config.verbose ?: true
-                    def credential = ansible_config.credential ?: ''
-                    def extraVars = ansible_config.extraVars ?: ''
-                    def async = ansible_config.async ?: false
+                    def towerServer = config?.towerServer ?: app_config?.towerServer ?: 'Ansible Tower prod'
+                    def towerCredentialsId = config?.towerCredentialsId ?: app_config?.towerCredentialsId ?: 'jenkinsansdmssqlpr'
+                    def templateType = config?.templateType ?: app_config?.templateType ?: 'job'
+                    def jobTemplate = config?.jobTemplate ?: app_config?.jobTemplate
+                    def towerLogLevel = config?.towerLogLevel ?: app_config?.towerLogLevel ?: 'full'
+                    def inventory = config?.inventory ?: app_config?.inventory ?: ''
+                    def jobTags = config?.jobTags ?: app_config?.jobTags ?: ''
+                    def skipJobTags = config?.skipJobTags ?: app_config?.skipJobTags ?: ''
+                    def limit = config?.limit ?: app_config?.limit ?: ''
+                    def removeColor = config?.removeColor ?: app_config?.removeColor ?: false
+                    def verbose = config?.verbose ?: app_config?.verbose ?: true
+                    def credential = config?.credential ?: app_config?.credential ?: ''
+                    def extraVars = config?.extraVars ?: app_config?.extraVars ?: ''
+                    def async = config?.async ?: app_config?.async ?: false
 
                     // Call Ansible Tower with the provided parameters
                     output = ansibleTower(
@@ -81,8 +145,33 @@ def call(Map ansible_config) {
         }
 }
 
+pipeline {
+    agent { label "terraform-1.0.0" }
+    environment {
+            TF_IN_AUTOMATION = 'true'
+			ec2_host_name = "cl0a3409"
+    }
+
+    stages {
+		stage ('Post Deploy'){
+			steps{
+                scm_checkout()
+				testAnsible()
+				runningAnsiblePlaybook(jobTemplate: 'SLC-Enterprise-Post-Deploy',
+extraVars: '''---
+ansible_inventory_hosts: '10.231.96.129'
+''')
+	}		
+	}
+    }
+}
 
 
+@merge
+libraries {
+    git
+    ansible
+}
 // ansibleTowerLibrary.groovy
 
 def call(Map config) {
